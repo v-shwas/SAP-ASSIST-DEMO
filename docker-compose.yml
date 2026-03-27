@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sap_chatbot_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sap_chatbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: sap_chatbot_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  sap-connector:
+    build: ./services/sap-connector
+    container_name: sap_chatbot_connector
+    ports:
+      - "8000:8000"
+    environment:
+      - CONNECTOR_SECRET=${SAP_CONNECTOR_SECRET:-change_me}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+  redis_data:
