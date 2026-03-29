@@ -179,12 +179,37 @@ export const SAP_TOOLS: Anthropic.Tool[] = [
     input_schema: {
       type: "object" as const,
       properties: {
-        period: { type: "string", description: "GST return period e.g. 'Mar-2024'" },
+        period: { type: "string", description: "GST return period e.g. 'Mar-2026'" },
         gstin: { type: "string", description: "GSTIN number, or omit for all GSTINs" },
         mismatch_only: {
           type: "boolean",
           description: "Return only mismatched line items",
         },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "get_cash_flow_forecast",
+    description:
+      "Retrieves cash flow forecast from SAP FI AR/AP, including accounts receivable aging by customer with risk levels and credit limits.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        days: { type: "number", description: "Forecast horizon in days (default 60)" },
+        drill_down: { type: "string", enum: ["customer", "region"], description: "Drill down dimension" },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "get_risk_insights",
+    description:
+      "Retrieves AI-powered business risk insights including receivable delays, credit risk, and regional risk scores.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        drill_down: { type: "string", enum: ["region", "customer", "product"], description: "Drill down dimension for risk breakdown" },
       },
       required: [],
     },

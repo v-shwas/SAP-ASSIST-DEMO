@@ -7,12 +7,14 @@ import { ChatInput } from "./ChatInput";
 import { Sparkles } from "lucide-react";
 
 const QUICK_ACTIONS = [
-  "What is my order profitability for this quarter?",
-  "Show me current inventory stock alerts",
-  "What is the status of my recent orders?",
-  "Predict next quarter sales by region",
-  "Show GST reconciliation status",
-  "Which products have the highest return rate?",
+  "Predict next quarter sales by product and region",
+  "What is my order profitability?",
+  "Show inventory optimization insights",
+  "Why is my order delayed?",
+  "Show cash flow forecast next 60 days",
+  "Show GST mismatch summary",
+  "Show business risks this month",
+  "Identify dead stock items and recommend reorder levels",
 ];
 
 interface ChatWindowProps {
@@ -46,9 +48,9 @@ export function ChatWindow({ onSendMessage, messages, isLoading }: ChatWindowPro
               <Sparkles className="h-7 w-7 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-800">Ask your SAP data anything</h2>
+              <h2 className="text-xl font-semibold text-slate-800">Tirupathi Oils — SAP Assistant</h2>
               <p className="text-sm text-slate-500 mt-1">
-                Claude will fetch live data from your SAP system to answer your questions.
+                Ask Joule about your sales, inventory, profitability, cash flow, or any SAP data.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl w-full">

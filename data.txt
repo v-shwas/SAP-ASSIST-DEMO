@@ -1,0 +1,166 @@
+Q- what is my order profitability,A- the order based on last y sr sale is 10%
+Q- why my order delayed A- Shipment late , do you want to choose alternative travel plan? y/n like this the response should be
+
+1. Sales Forecast → Drill Down
+User Input:
+
+“Predict next quarter sales”
+
+AI Output:
+
+Predictive Sales Forecast — SAP SD + Embedded Analytics
+
+Forecast Revenue: ₹128 Cr (▲ +8.6% QoQ)
+Confidence Level: 87%
+
+Top Growth Driver: Electronics (+12%)
+
+User:
+
+“Drill down by Sales Organization”
+
+AI Output:
+
+Forecast Breakdown — By Sales Organization (SD-Billing Data Model)
+
+Sales Org	Forecast Revenue	Growth %	Confidence	Key Driver
+1000 — NA	₹52 Cr	+10.2%	91%	Electronics demand
+2000 — EU	₹38 Cr	+6.4%	85%	Stable orders
+3000 — APAC	₹28 Cr	+9.1%	88%	New customers
+4000 — LATAM	₹10 Cr	+4.3%	80%	Seasonal
+
+System Note:
+Source: SD Billing (VBRP), LIS + Predictive Model (PAL)
+
+2. Cash Flow → Drill Down
+User Input:
+
+“Show cash flow forecast next 60 days”
+
+AI Output:
+
+Cash Flow Forecast — SAP FI (AR/AP)
+
+ Inflow: ₹25 Cr
+ Outflow: ₹31 Cr
+ Net Gap: ₹6 Cr
+
+User:
+
+“Drill down by customer overdue”
+
+AI Output:
+
+Accounts Receivable Aging — Customer Level (FBL5N / ACDOCA)
+
+Customer	Outstanding	Aging Days	Risk Level	Credit Limit
+ABC Corp	₹2.1 Cr	75 Days	High 🔴	₹3 Cr
+XYZ Ltd	₹1.4 Cr	62 Days	High 🔴	₹2 Cr
+PQR Ltd	₹0.9 Cr	48 Days	Medium 🟠	₹1.5 Cr
+LMN Ltd	₹0.6 Cr	30 Days	Low 🟢	₹1 Cr
+System Note:
+Source: FI-AR Line Items (BSID/ACDOCA), Aging logic via Fiori app
+
+3. Profitability → Drill Down (Advanced Version)
+User Input:
+
+“What is my order profitability?”
+AI Output:
+CO-PA Profitability — Operating Concern: S4CORP
+Operating Margin: 10.4% (▲ +1.2% vs Plan)
+Top Segment: Electronics (14.2%)
+User:
+“Drill down by customer segment”
+
+AI Output:
+
+CO-PA Drill-Down — Customer Segment (KE24 / ACDOCA)
+
+Customer Segment	Revenue	Margin %	Var vs Plan	Contribution
+Retail	₹22 Cr	12.8%	+1.5%	38%
+Wholesale	₹15 Cr	10.2%	+0.6%	26%
+Direct B2B	₹12 Cr	9.4%	−0.8%	21%
+Online	₹9 Cr	13.6%	+2.1%	15%
+
+System Note:
+Source: CO-PA Actual Line Items (KE24), Value Fields mapping
+
+4. Inventory → Drill Down
+User Input:
+“Show inventory optimization insights”
+AI Output:
+Inventory Intelligence — SAP MM
+Dead Stock: ₹3.2 Cr
+Overstock: +22% Automotive
+User:
+“Drill down by plant”
+AI Output:
+Inventory Breakdown — Plant Level (MM / MARD / MATDOC)
+
+Plant	Stock Value	Dead Stock %	Overstock %	Stockout Risk
+1000 — Mumbai	₹12 Cr	18%	12%	Low
+2000 — Chennai	₹9 Cr	22%	18%	Medium
+3000 — Delhi	₹7 Cr	28%	25%	High
+4000 — Pune	₹5 Cr	15%	10%	Low
+
+System Note:
+Source: Material Ledger (CKMLCP), Inventory tables (MARD/MATDOC)
+
+ 5. GST / Tax → Drill Down
+User Input:
+
+“Show GST mismatch summary”
+
+AI Output:
+
+GST Reconciliation — SAP FI
+
+Mismatch: ₹1.8 Cr
+User:
+“Drill down by vendor”
+AI Output:
+GST Mismatch — Vendor Level (FI + GSTR-2A/2B)
+
+Vendor	Invoice Value	Claimed ITC	Eligible ITC	Mismatch
+Vendor A	₹80 L	₹80 L	₹60 L	₹20 L
+Vendor B	₹65 L	₹65 L	₹50 L	₹15 L
+Vendor C	₹40 L	₹40 L	₹32 L	₹8 L
+
+System Note:
+Source: FI Invoice Data + GST API reconciliation
+
+6. AI Insights → Drill Down
+User Input:
+
+“Show business risks this month”
+
+AI Output:
+
+Top Risk: Receivables delay ₹4.2 Cr
+User:
+
+“Drill down by region”
+AI Output:
+
+Risk Breakdown — Region Level
+
+Region	Overdue Amount	Avg Delay	Risk Score
+NA	₹1.8 Cr	52 Days	High
+EU	₹1.2 Cr	48 Days	Medium
+APAC	₹0.8 Cr	39 Days	Medium
+LATAM	₹0.4 Cr	30 Days	Low
+
+)
+
+The questions or outputs should not be exactly like the above ones, they are for reference 
+
+Push the below data to the database as this is a demo project
+Company: Tirupathi Oils
+Products:
+Cottonseed Oil
+Groundnut Oil
+Sunflower Oil
+Corn Oil
+Soyabean Oil
+Rice Bran Oil
+Mustard Oil

@@ -26,6 +26,8 @@ const TOOL_ROUTES: Record<string, string> = {
   get_supplier_info: "/mm/suppliers",
   get_demand_forecast: "/analytics/forecast",
   run_analytics_query: "/analytics/query",
+  get_cash_flow_forecast: "/fico/cash-flow",
+  get_risk_insights: "/analytics/risk-insights",
 };
 
 export async function executeSapTool(
