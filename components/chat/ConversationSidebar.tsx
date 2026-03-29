@@ -27,8 +27,8 @@ export function ConversationSidebar({ activeId, onSelect, onNew }: ConversationS
         const data = await res.json();
         setConversations(data.conversations);
       }
-    } catch {
-      // silently fail — sidebar is non-critical
+    } catch (err) {
+      console.warn("[sidebar] failed to fetch conversations:", err);
     }
   };
 

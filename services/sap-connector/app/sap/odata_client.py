@@ -29,7 +29,7 @@ class ODataClient:
             verify=self._config.verify_ssl,
             timeout=30,
         ) as client:
-            resp = client.get(url, params=query)
+            resp = await client.get(url, params=query)
             resp.raise_for_status()
             return resp.json()
 

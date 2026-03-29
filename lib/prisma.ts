@@ -4,7 +4,7 @@
  */
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import pg from "pg";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -13,12 +13,13 @@ declare global {
 
 export function getPrisma(): PrismaClient {
   if (!global.__prisma) {
-    const pool = new Pool({
+    const pool = new pg.Pool({
       connectionString: process.env.DATABASE_URL ?? "",
       connectionTimeoutMillis: 3000, // fail fast if Postgres isn't running
       max: 5,
     });
-    const adapter = new PrismaPg(pool);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dual @types/pg versions cause incompatible Pool types
+    const adapter = new PrismaPg(pool as any);
     global.__prisma = new PrismaClient({ adapter });
   }
   return global.__prisma;

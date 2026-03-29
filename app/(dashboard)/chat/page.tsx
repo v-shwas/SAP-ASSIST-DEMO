@@ -33,8 +33,8 @@ export default function ChatPage() {
           }))
         );
       }
-    } catch {
-      // fail silently
+    } catch (err) {
+      console.warn("[chat] failed to load conversation:", err);
     }
   };
 
@@ -49,8 +49,8 @@ export default function ChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role, content }),
       });
-    } catch {
-      // persist failures are non-blocking
+    } catch (err) {
+      console.warn("[chat] failed to persist message:", err);
     }
   };
 
@@ -70,8 +70,8 @@ export default function ChatPage() {
             convId = data.conversation.id;
             setConversationId(convId);
           }
-        } catch {
-          // continue without persistence
+        } catch (err) {
+          console.warn("[chat] failed to create conversation:", err);
         }
       }
 
@@ -123,21 +123,23 @@ export default function ChatPage() {
             try {
               const event = JSON.parse(data);
               if (event.type === "tool_call") {
+                const callId = event.id ?? event.name;
                 setMessages((prev) =>
                   prev.map((m) =>
                     m.id === assistantId
-                      ? { ...m, toolCalls: [...(m.toolCalls ?? []), { name: event.name, status: "running" as const }] }
+                      ? { ...m, toolCalls: [...(m.toolCalls ?? []), { name: event.name, id: callId, status: "running" as const }] }
                       : m
                   )
                 );
               } else if (event.type === "tool_result") {
+                const callId = event.id ?? event.name;
                 setMessages((prev) =>
                   prev.map((m) =>
                     m.id === assistantId
                       ? {
                           ...m,
                           toolCalls: (m.toolCalls ?? []).map((tc) =>
-                            tc.name === event.name ? { ...tc, status: "done" as const } : tc
+                            (tc.id ?? tc.name) === callId ? { ...tc, status: "done" as const } : tc
                           ),
                         }
                       : m

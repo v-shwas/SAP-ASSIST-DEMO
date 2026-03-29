@@ -57,6 +57,7 @@ export function ChatWindow({ onSendMessage, messages, isLoading }: ChatWindowPro
                   key={action}
                   onClick={() => {
                     setInput(action);
+                    onSendMessage(action);
                   }}
                   className="text-left text-sm px-4 py-3 rounded-xl border bg-white hover:border-blue-300 hover:bg-blue-50 transition-colors text-slate-600"
                 >

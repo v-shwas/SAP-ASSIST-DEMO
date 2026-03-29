@@ -12,7 +12,8 @@ export async function GET(
       orderBy: { createdAt: "asc" },
     });
     return Response.json({ messages });
-  } catch {
+  } catch (err) {
+    console.warn("[messages] GET failed:", err);
     return Response.json({ messages: [] });
   }
 }
@@ -46,7 +47,8 @@ export async function POST(
     }
 
     return Response.json({ message });
-  } catch {
+  } catch (err) {
+    console.warn("[messages] POST failed:", err);
     return Response.json({ message: { id: `msg-${Date.now()}`, role, content } });
   }
 }

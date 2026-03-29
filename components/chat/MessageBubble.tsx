@@ -10,7 +10,7 @@ export interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  toolCalls?: Array<{ name: string; status: "running" | "done" }>;
+  toolCalls?: Array<{ name: string; id?: string; status: "running" | "done" }>;
 }
 
 interface MessageBubbleProps {
@@ -31,11 +31,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
       <div className={cn("flex flex-col gap-1.5 max-w-[80%]", isUser && "items-end")}>
         {/* Tool call indicators */}
-        {message.toolCalls?.map((tc, i) =>
-          tc.status === "running" ? (
-            <ToolCallIndicator key={i} toolName={tc.name} />
-          ) : null
-        )}
+        {message.toolCalls?.map((tc, i) => (
+          <ToolCallIndicator key={tc.id ?? i} toolName={tc.name} status={tc.status} />
+        ))}
 
         {/* Message content */}
         {message.content && (

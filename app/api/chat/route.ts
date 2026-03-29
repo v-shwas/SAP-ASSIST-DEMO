@@ -24,7 +24,7 @@ You have access to SAP modules: SD (Sales), MM (Materials), CO-PA (Profitability
 
 function hasClaude(): boolean {
   const key = process.env.ANTHROPIC_API_KEY ?? "";
-  return key.length > 10 && !key.startsWith("your_");
+  return key.length > 20 && !key.startsWith("your_") && key.startsWith("sk-");
 }
 
 /** Fully local mock response — no API key needed. Fetches real mock SAP data. */
@@ -106,10 +106,29 @@ async function mockAiResponse(
 }
 
 export async function POST(request: Request) {
-  const { messages } = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
-  if (!Array.isArray(messages)) {
-    return Response.json({ error: "messages must be an array" }, { status: 400 });
+  const { messages } = body as { messages?: unknown };
+
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return Response.json({ error: "messages must be a non-empty array" }, { status: 400 });
+  }
+
+  // Validate message structure
+  for (const m of messages) {
+    if (
+      typeof m !== "object" || m === null ||
+      !("role" in m) || !("content" in m) ||
+      !["user", "assistant"].includes(m.role) ||
+      typeof m.content !== "string"
+    ) {
+      return Response.json({ error: "Each message must have role (user|assistant) and content (string)" }, { status: 400 });
+    }
   }
 
   const encoder = new TextEncoder();
@@ -126,7 +145,6 @@ export async function POST(request: Request) {
           await mockAiResponse(lastUserMsg?.content ?? "", send);
           send({ type: "done" });
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-          controller.close();
           return;
         }
 

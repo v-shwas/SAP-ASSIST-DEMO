@@ -9,8 +9,8 @@ export async function GET() {
       select: { id: true, title: true, updatedAt: true },
     });
     return Response.json({ conversations });
-  } catch {
-    // DB not ready yet — return empty list gracefully
+  } catch (err) {
+    console.warn("[conversations] GET failed:", err);
     return Response.json({ conversations: [] });
   }
 }
@@ -27,8 +27,8 @@ export async function POST(request: Request) {
       },
     });
     return Response.json({ conversation });
-  } catch {
-    // DB not ready — return a fake id so the chat still works
+  } catch (err) {
+    console.warn("[conversations] POST failed:", err);
     return Response.json({ conversation: { id: `local-${Date.now()}`, title } });
   }
 }
