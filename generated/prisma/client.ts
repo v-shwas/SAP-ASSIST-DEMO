@@ -66,3 +66,58 @@ export type Message = Prisma.MessageModel
  * 
  */
 export type ApiKey = Prisma.ApiKeyModel
+/**
+ * Model SapProduct
+ * 
+ */
+export type SapProduct = Prisma.SapProductModel
+/**
+ * Model SapCustomer
+ * 
+ */
+export type SapCustomer = Prisma.SapCustomerModel
+/**
+ * Model SapOrder
+ * 
+ */
+export type SapOrder = Prisma.SapOrderModel
+/**
+ * Model SapShipment
+ * 
+ */
+export type SapShipment = Prisma.SapShipmentModel
+/**
+ * Model SapInventory
+ * 
+ */
+export type SapInventory = Prisma.SapInventoryModel
+/**
+ * Model SapSupplier
+ * 
+ */
+export type SapSupplier = Prisma.SapSupplierModel
+/**
+ * Model SapRevenue
+ * 
+ */
+export type SapRevenue = Prisma.SapRevenueModel
+/**
+ * Model SapGstRecord
+ * 
+ */
+export type SapGstRecord = Prisma.SapGstRecordModel
+/**
+ * Model SapSalesOrg
+ * 
+ */
+export type SapSalesOrg = Prisma.SapSalesOrgModel
+/**
+ * Model SapPlant
+ * 
+ */
+export type SapPlant = Prisma.SapPlantModel
+/**
+ * Model SapRiskRegion
+ * 
+ */
+export type SapRiskRegion = Prisma.SapRiskRegionModel

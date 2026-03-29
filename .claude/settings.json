@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const g = require\\(''@google/generative-ai''\\); console.log\\(Object.keys\\(g\\).filter\\(k => k.includes\\(''Schema''\\) || k.includes\\(''Function''\\) || k.includes\\(''Type''\\)\\)\\)\")",
+      "Bash(npm uninstall:*)"
+    ]
+  }
+}

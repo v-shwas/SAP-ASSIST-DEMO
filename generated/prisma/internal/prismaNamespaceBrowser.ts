@@ -55,7 +55,18 @@ export const ModelName = {
   User: 'User',
   Conversation: 'Conversation',
   Message: 'Message',
-  ApiKey: 'ApiKey'
+  ApiKey: 'ApiKey',
+  SapProduct: 'SapProduct',
+  SapCustomer: 'SapCustomer',
+  SapOrder: 'SapOrder',
+  SapShipment: 'SapShipment',
+  SapInventory: 'SapInventory',
+  SapSupplier: 'SapSupplier',
+  SapRevenue: 'SapRevenue',
+  SapGstRecord: 'SapGstRecord',
+  SapSalesOrg: 'SapSalesOrg',
+  SapPlant: 'SapPlant',
+  SapRiskRegion: 'SapRiskRegion'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -137,6 +148,156 @@ export const ApiKeyScalarFieldEnum = {
 } as const
 
 export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof ApiKeyScalarFieldEnum]
+
+
+export const SapProductScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  category: 'category',
+  revenue: 'revenue',
+  cost: 'cost',
+  marginPct: 'marginPct',
+  orders: 'orders'
+} as const
+
+export type SapProductScalarFieldEnum = (typeof SapProductScalarFieldEnum)[keyof typeof SapProductScalarFieldEnum]
+
+
+export const SapCustomerScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  segment: 'segment',
+  gstin: 'gstin',
+  creditLimit: 'creditLimit',
+  outstanding: 'outstanding',
+  agingDays: 'agingDays',
+  riskLevel: 'riskLevel'
+} as const
+
+export type SapCustomerScalarFieldEnum = (typeof SapCustomerScalarFieldEnum)[keyof typeof SapCustomerScalarFieldEnum]
+
+
+export const SapOrderScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  customerId: 'customerId',
+  product: 'product',
+  value: 'value',
+  status: 'status',
+  date: 'date',
+  delayReason: 'delayReason'
+} as const
+
+export type SapOrderScalarFieldEnum = (typeof SapOrderScalarFieldEnum)[keyof typeof SapOrderScalarFieldEnum]
+
+
+export const SapShipmentScalarFieldEnum = {
+  id: 'id',
+  deliveryId: 'deliveryId',
+  orderId: 'orderId',
+  carrier: 'carrier',
+  status: 'status',
+  product: 'product',
+  eta: 'eta',
+  actual: 'actual',
+  delayReason: 'delayReason'
+} as const
+
+export type SapShipmentScalarFieldEnum = (typeof SapShipmentScalarFieldEnum)[keyof typeof SapShipmentScalarFieldEnum]
+
+
+export const SapInventoryScalarFieldEnum = {
+  id: 'id',
+  materialCode: 'materialCode',
+  productId: 'productId',
+  plant: 'plant',
+  stock: 'stock',
+  stockValue: 'stockValue',
+  safetyStock: 'safetyStock',
+  coverageDays: 'coverageDays',
+  unit: 'unit',
+  aiSignal: 'aiSignal'
+} as const
+
+export type SapInventoryScalarFieldEnum = (typeof SapInventoryScalarFieldEnum)[keyof typeof SapInventoryScalarFieldEnum]
+
+
+export const SapSupplierScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  name: 'name',
+  category: 'category',
+  onTimePct: 'onTimePct',
+  qualityScore: 'qualityScore',
+  activePos: 'activePos'
+} as const
+
+export type SapSupplierScalarFieldEnum = (typeof SapSupplierScalarFieldEnum)[keyof typeof SapSupplierScalarFieldEnum]
+
+
+export const SapRevenueScalarFieldEnum = {
+  id: 'id',
+  period: 'period',
+  revenue: 'revenue',
+  target: 'target',
+  yoyGrowth: 'yoyGrowth',
+  type: 'type'
+} as const
+
+export type SapRevenueScalarFieldEnum = (typeof SapRevenueScalarFieldEnum)[keyof typeof SapRevenueScalarFieldEnum]
+
+
+export const SapGstRecordScalarFieldEnum = {
+  id: 'id',
+  gstin: 'gstin',
+  party: 'party',
+  booksAmount: 'booksAmount',
+  gstPortal: 'gstPortal',
+  diff: 'diff',
+  status: 'status',
+  period: 'period'
+} as const
+
+export type SapGstRecordScalarFieldEnum = (typeof SapGstRecordScalarFieldEnum)[keyof typeof SapGstRecordScalarFieldEnum]
+
+
+export const SapSalesOrgScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  forecastRevenue: 'forecastRevenue',
+  growthPct: 'growthPct',
+  confidence: 'confidence',
+  keyDriver: 'keyDriver'
+} as const
+
+export type SapSalesOrgScalarFieldEnum = (typeof SapSalesOrgScalarFieldEnum)[keyof typeof SapSalesOrgScalarFieldEnum]
+
+
+export const SapPlantScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  stockValue: 'stockValue',
+  deadStockPct: 'deadStockPct',
+  overstockPct: 'overstockPct',
+  stockoutRisk: 'stockoutRisk'
+} as const
+
+export type SapPlantScalarFieldEnum = (typeof SapPlantScalarFieldEnum)[keyof typeof SapPlantScalarFieldEnum]
+
+
+export const SapRiskRegionScalarFieldEnum = {
+  id: 'id',
+  region: 'region',
+  overdueAmount: 'overdueAmount',
+  avgDelayDays: 'avgDelayDays',
+  riskScore: 'riskScore'
+} as const
+
+export type SapRiskRegionScalarFieldEnum = (typeof SapRiskRegionScalarFieldEnum)[keyof typeof SapRiskRegionScalarFieldEnum]
 
 
 export const SortOrder = {

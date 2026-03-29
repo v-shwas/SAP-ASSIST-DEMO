@@ -106,3 +106,157 @@ enum MessageRole {
   assistant
   system
 }
+
+// ─── SAP Demo Data Models (Tirupathi Oils) ───
+
+model SapProduct {
+  id        String @id @default(cuid())
+  code      String @unique
+  name      String
+  category  String @default("Edible Oil")
+  revenue   Float
+  cost      Float
+  marginPct Float
+  orders    Int
+
+  inventory SapInventory[]
+
+  @@map("sap_products")
+}
+
+model SapCustomer {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  name        String
+  segment     String
+  gstin       String?
+  creditLimit Float
+  outstanding Float   @default(0)
+  agingDays   Int     @default(0)
+  riskLevel   String  @default("Low")
+
+  orders SapOrder[]
+
+  @@map("sap_customers")
+}
+
+model SapOrder {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  customerId  String
+  product     String
+  value       Float
+  status      String
+  date        DateTime
+  delayReason String?
+
+  customer SapCustomer @relation(fields: [customerId], references: [id])
+  shipment SapShipment?
+
+  @@map("sap_orders")
+}
+
+model SapShipment {
+  id          String    @id @default(cuid())
+  deliveryId  String    @unique
+  orderId     String    @unique
+  carrier     String
+  status      String
+  product     String
+  eta         DateTime
+  actual      DateTime?
+  delayReason String?
+
+  order SapOrder @relation(fields: [orderId], references: [orderId])
+
+  @@map("sap_shipments")
+}
+
+model SapInventory {
+  id           String @id @default(cuid())
+  materialCode String
+  productId    String
+  plant        String
+  stock        Int
+  stockValue   Float
+  safetyStock  Int
+  coverageDays Int
+  unit         String @default("Cases")
+  aiSignal     String
+
+  product SapProduct @relation(fields: [productId], references: [id])
+
+  @@unique([materialCode, plant])
+  @@map("sap_inventory")
+}
+
+model SapSupplier {
+  id           String @id @default(cuid())
+  vendorId     String @unique
+  name         String
+  category     String
+  onTimePct    Float
+  qualityScore Float
+  activePos    Int
+
+  @@map("sap_suppliers")
+}
+
+model SapRevenue {
+  id        String @id @default(cuid())
+  period    String
+  revenue   Float
+  target    Float
+  yoyGrowth Float
+  type      String @default("monthly")
+
+  @@unique([period, type])
+  @@map("sap_revenue")
+}
+
+model SapGstRecord {
+  id          String @id @default(cuid())
+  gstin       String
+  party       String
+  booksAmount Float
+  gstPortal   Float
+  diff        Float
+  status      String
+  period      String
+
+  @@map("sap_gst_records")
+}
+
+model SapSalesOrg {
+  id              String @id @default(cuid())
+  code            String @unique
+  name            String
+  forecastRevenue Float
+  growthPct       Float
+  confidence      Float
+  keyDriver       String
+
+  @@map("sap_sales_orgs")
+}
+
+model SapPlant {
+  id           String @id @default(cuid())
+  code         String @unique
+  name         String
+  stockValue   Float
+  deadStockPct Float
+  overstockPct Float
+  stockoutRisk String
+
+  @@map("sap_plants")
+}
+
+model SapRiskRegion {
+  id            String @id @default(cuid())
+  region        String @unique
+  overdueAmount Float
+  avgDelayDays  Int
+  riskScore     String
+
+  @@map("sap_risk_regions")
+}

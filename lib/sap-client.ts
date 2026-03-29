@@ -1,9 +1,9 @@
 /**
- * SAP Client — routes Claude tool calls to either:
- *   - Mock data (USE_MOCK_SAP=true, default for dev)
- *   - Real SAP Connector microservice (USE_MOCK_SAP=false)
+ * SAP Client — routes tool calls to either:
+ *   - Neon PostgreSQL database (default — demo data)
+ *   - Real SAP Connector microservice (USE_MOCK_SAP=false, SAP_CONNECTOR_URL set)
  */
-import { executeMockTool } from "@/lib/mock-sap";
+import { executeSapQuery } from "@/lib/sap-data";
 
 interface SapCredentials {
   baseUrl: string;
@@ -13,7 +13,7 @@ interface SapCredentials {
   connType?: "odata" | "rfc";
 }
 
-// Map Claude tool names → connector endpoint paths
+// Map tool names → SAP connector endpoint paths (used when connecting to real SAP)
 const TOOL_ROUTES: Record<string, string> = {
   get_profitability_report: "/fico/profitability",
   get_revenue_data: "/fico/revenue",
@@ -35,18 +35,26 @@ export async function executeSapTool(
   input: Record<string, unknown>,
   credentials?: SapCredentials
 ): Promise<unknown> {
-  const useMock = process.env.USE_MOCK_SAP !== "false";
-
-  if (useMock) {
-    return executeMockTool(toolName, input);
+  // If a real SAP connector is configured, use it
+  if (process.env.USE_MOCK_SAP === "false" && process.env.SAP_CONNECTOR_URL) {
+    return executeSapConnector(toolName, input, credentials);
   }
 
+  // Default: query from Neon PostgreSQL database
+  return executeSapQuery(toolName, input);
+}
+
+async function executeSapConnector(
+  toolName: string,
+  input: Record<string, unknown>,
+  credentials?: SapCredentials
+): Promise<unknown> {
   const route = TOOL_ROUTES[toolName];
   if (!route) {
     return { error: `No connector route for tool: ${toolName}` };
   }
 
-  const connectorUrl = process.env.SAP_CONNECTOR_URL ?? "http://localhost:8000";
+  const connectorUrl = process.env.SAP_CONNECTOR_URL!;
   const secret = process.env.SAP_CONNECTOR_SECRET ?? "";
 
   const headers: Record<string, string> = {
