@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, SchemaType, type FunctionDeclaration, type Content, type Part } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { executeSapTool } from "@/lib/sap-client";
 
 const SYSTEM_PROMPT = `You are Joule, the AI assistant for Tirupathi Oils — an edible oil manufacturing company. You help business users query live SAP data and understand their business operations.
@@ -27,161 +27,200 @@ Supported chart types: "bar", "line", "pie". Use charts for trend data, comparis
 
 You have access to SAP modules: SD (Sales & Billing), MM (Materials & Inventory), CO-PA (Profitability), FI (Finance/GST/AR/AP), LE (Logistics), IBP (Forecasting), and AI Risk Analytics.`;
 
-// Gemini function declarations (equivalent to Anthropic tools)
-const GEMINI_TOOLS: FunctionDeclaration[] = [
+// OpenAI-compatible tool definitions for Groq
+const TOOLS: Groq.Chat.ChatCompletionTool[] = [
   {
-    name: "get_profitability_report",
-    description: "Retrieves order profitability data from SAP CO-PA including revenue, cost, and margin by product, customer, or region.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        period: { type: SchemaType.STRING, description: "Period in YYYY-QN or YYYY-MM format" },
-        dimension: { type: SchemaType.STRING, description: "Grouping dimension: product, customer, region, or plant" },
-        top_n: { type: SchemaType.NUMBER, description: "Return top N results (default 7)" },
+    type: "function",
+    function: {
+      name: "get_profitability_report",
+      description: "Retrieves order profitability data from SAP CO-PA including revenue, cost, and margin by product, customer, or region.",
+      parameters: {
+        type: "object",
+        properties: {
+          period: { type: "string", description: "Period in YYYY-QN or YYYY-MM format" },
+          dimension: { type: "string", description: "Grouping dimension: product, customer, region, or plant" },
+          top_n: { type: "number", description: "Return top N results (default 7)" },
+        },
       },
     },
   },
   {
-    name: "get_revenue_data",
-    description: "Retrieves revenue data from SAP SD, broken down by period, region, or product line with YoY comparison.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        period: { type: SchemaType.STRING, description: "Period e.g. '2026-Q1', 'YTD'" },
-        region: { type: SchemaType.STRING, description: "Region filter, e.g. 'South', 'All'" },
-        granularity: { type: SchemaType.STRING, description: "Time granularity: monthly, quarterly, yearly" },
+    type: "function",
+    function: {
+      name: "get_revenue_data",
+      description: "Retrieves revenue data from SAP SD, broken down by period, region, or product line with YoY comparison.",
+      parameters: {
+        type: "object",
+        properties: {
+          period: { type: "string", description: "Period e.g. '2026-Q1', 'YTD'" },
+          region: { type: "string", description: "Region filter, e.g. 'South', 'All'" },
+          granularity: { type: "string", description: "Time granularity: monthly, quarterly, yearly" },
+        },
       },
     },
   },
   {
-    name: "get_cost_analysis",
-    description: "Fetches cost center and cost element analysis from SAP CO, including variances.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        cost_center: { type: SchemaType.STRING, description: "Cost center ID or 'All'" },
-        period: { type: SchemaType.STRING, description: "Period in YYYY-QN or YYYY-MM" },
+    type: "function",
+    function: {
+      name: "get_cost_analysis",
+      description: "Fetches cost center and cost element analysis from SAP CO, including variances.",
+      parameters: {
+        type: "object",
+        properties: {
+          cost_center: { type: "string", description: "Cost center ID or 'All'" },
+          period: { type: "string", description: "Period in YYYY-QN or YYYY-MM" },
+        },
       },
     },
   },
   {
-    name: "get_order_status",
-    description: "Gets current status of sales orders from SAP SD, including delivery and billing status. Also shows delayed orders.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        order_id: { type: SchemaType.STRING, description: "Specific order ID, or omit for recent orders" },
-        status_filter: { type: SchemaType.STRING, description: "Filter: open, delivered, billed, or all" },
-        limit: { type: SchemaType.NUMBER, description: "Number of orders to return (default 10)" },
+    type: "function",
+    function: {
+      name: "get_order_status",
+      description: "Gets current status of sales orders from SAP SD, including delivery and billing status. Also shows delayed orders.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_id: { type: "string", description: "Specific order ID, or omit for recent orders" },
+          status_filter: { type: "string", description: "Filter: open, delivered, billed, or all" },
+          limit: { type: "number", description: "Number of orders to return (default 10)" },
+        },
       },
     },
   },
   {
-    name: "get_shipment_tracking",
-    description: "Tracks outbound deliveries and shipments from SAP LE/WM. Shows delayed shipments with alternative travel plans.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        delivery_id: { type: SchemaType.STRING, description: "Specific delivery ID" },
-        date_range: { type: SchemaType.STRING, description: "Date range e.g. 'last_7_days'" },
+    type: "function",
+    function: {
+      name: "get_shipment_tracking",
+      description: "Tracks outbound deliveries and shipments from SAP LE/WM. Shows delayed shipments with alternative travel plans.",
+      parameters: {
+        type: "object",
+        properties: {
+          delivery_id: { type: "string", description: "Specific delivery ID" },
+          date_range: { type: "string", description: "Date range e.g. 'last_7_days'" },
+        },
       },
     },
   },
   {
-    name: "get_return_order_info",
-    description: "Retrieves return order (RMA) data from SAP SD including reason codes and status.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        period: { type: SchemaType.STRING, description: "Period filter" },
-        reason_code: { type: SchemaType.STRING, description: "Filter by return reason code" },
+    type: "function",
+    function: {
+      name: "get_return_order_info",
+      description: "Retrieves return order (RMA) data from SAP SD including reason codes and status.",
+      parameters: {
+        type: "object",
+        properties: {
+          period: { type: "string", description: "Period filter" },
+          reason_code: { type: "string", description: "Filter by return reason code" },
+        },
       },
     },
   },
   {
-    name: "get_inventory_levels",
-    description: "Fetches current stock levels from SAP MM/WM, including safety stock alerts, dead stock, and AI signals for each item.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        material: { type: SchemaType.STRING, description: "Material number or 'all'" },
-        plant: { type: SchemaType.STRING, description: "Plant code or 'all'" },
-        alert_only: { type: SchemaType.BOOLEAN, description: "If true, return only items with alerts" },
+    type: "function",
+    function: {
+      name: "get_inventory_levels",
+      description: "Fetches current stock levels from SAP MM/WM, including safety stock alerts, dead stock, and AI signals for each item.",
+      parameters: {
+        type: "object",
+        properties: {
+          material: { type: "string", description: "Material number or 'all'" },
+          plant: { type: "string", description: "Plant code or 'all'" },
+          alert_only: { type: "boolean", description: "If true, return only items with alerts" },
+        },
       },
     },
   },
   {
-    name: "get_supplier_info",
-    description: "Gets supplier/vendor master data and performance metrics from SAP MM.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        vendor_id: { type: SchemaType.STRING, description: "Vendor ID or omit for all" },
-        include_performance: { type: SchemaType.BOOLEAN, description: "Include delivery reliability and quality scores" },
+    type: "function",
+    function: {
+      name: "get_supplier_info",
+      description: "Gets supplier/vendor master data and performance metrics from SAP MM.",
+      parameters: {
+        type: "object",
+        properties: {
+          vendor_id: { type: "string", description: "Vendor ID or omit for all" },
+          include_performance: { type: "boolean", description: "Include delivery reliability and quality scores" },
+        },
       },
     },
   },
   {
-    name: "get_demand_forecast",
-    description: "Retrieves demand forecast from SAP using Prophet/LSTM/SAC Smart Predict models.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        material: { type: SchemaType.STRING, description: "Material number" },
-        horizon_months: { type: SchemaType.NUMBER, description: "Forecast horizon in months (default 3)" },
-        region: { type: SchemaType.STRING, description: "Region filter" },
+    type: "function",
+    function: {
+      name: "get_demand_forecast",
+      description: "Retrieves demand forecast from SAP using Prophet/LSTM/SAC Smart Predict models.",
+      parameters: {
+        type: "object",
+        properties: {
+          material: { type: "string", description: "Material number" },
+          horizon_months: { type: "number", description: "Forecast horizon in months (default 3)" },
+          region: { type: "string", description: "Region filter" },
+        },
       },
     },
   },
   {
-    name: "run_analytics_query",
-    description: "Runs a flexible analytics query against SAP BW/HANA CDS views for ad-hoc analysis.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        metric: { type: SchemaType.STRING, description: "KPI: 'revenue', 'margin', 'stock_turns'" },
-        period: { type: SchemaType.STRING, description: "Period filter" },
-      },
-      required: ["metric"],
-    },
-  },
-  {
-    name: "get_gst_reconciliation",
-    description: "Fetches GST input/output tax reconciliation from SAP FI-Tax, comparing books vs GSTN portal data.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        period: { type: SchemaType.STRING, description: "GST return period e.g. 'Mar-2026'" },
-        gstin: { type: SchemaType.STRING, description: "GSTIN number, or omit for all" },
-        mismatch_only: { type: SchemaType.BOOLEAN, description: "Return only mismatched items" },
+    type: "function",
+    function: {
+      name: "run_analytics_query",
+      description: "Runs a flexible analytics query against SAP BW/HANA CDS views for ad-hoc analysis.",
+      parameters: {
+        type: "object",
+        properties: {
+          metric: { type: "string", description: "KPI: 'revenue', 'margin', 'stock_turns'" },
+          period: { type: "string", description: "Period filter" },
+        },
+        required: ["metric"],
       },
     },
   },
   {
-    name: "get_cash_flow_forecast",
-    description: "Retrieves cash flow forecast from SAP FI AR/AP, including accounts receivable aging by customer.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        days: { type: SchemaType.NUMBER, description: "Forecast horizon in days (default 60)" },
-        drill_down: { type: SchemaType.STRING, description: "Drill down: customer or region" },
+    type: "function",
+    function: {
+      name: "get_gst_reconciliation",
+      description: "Fetches GST input/output tax reconciliation from SAP FI-Tax, comparing books vs GSTN portal data.",
+      parameters: {
+        type: "object",
+        properties: {
+          period: { type: "string", description: "GST return period e.g. 'Mar-2026'" },
+          gstin: { type: "string", description: "GSTIN number, or omit for all" },
+          mismatch_only: { type: "boolean", description: "Return only mismatched items" },
+        },
       },
     },
   },
   {
-    name: "get_risk_insights",
-    description: "Retrieves AI-powered business risk insights including receivable delays and regional risk scores.",
-    parameters: {
-      type: SchemaType.OBJECT,
-      properties: {
-        drill_down: { type: SchemaType.STRING, description: "Drill down: region, customer, or product" },
+    type: "function",
+    function: {
+      name: "get_cash_flow_forecast",
+      description: "Retrieves cash flow forecast from SAP FI AR/AP, including accounts receivable aging by customer.",
+      parameters: {
+        type: "object",
+        properties: {
+          days: { type: "number", description: "Forecast horizon in days (default 60)" },
+          drill_down: { type: "string", description: "Drill down: customer or region" },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_risk_insights",
+      description: "Retrieves AI-powered business risk insights including receivable delays and regional risk scores.",
+      parameters: {
+        type: "object",
+        properties: {
+          drill_down: { type: "string", description: "Drill down: region, customer, or product" },
+        },
       },
     },
   },
 ];
 
-function hasGemini(): boolean {
-  const key = process.env.GEMINI_API_KEY ?? "";
+function hasGroq(): boolean {
+  const key = process.env.GROQ_API_KEY ?? "";
   return key.length > 10 && !key.startsWith("your_");
 }
 
@@ -210,9 +249,9 @@ export async function POST(request: Request) {
     }
   }
 
-  if (!hasGemini()) {
+  if (!hasGroq()) {
     return Response.json(
-      { error: "GEMINI_API_KEY is not configured. Add your Gemini API key to .env.local" },
+      { error: "GROQ_API_KEY is not configured. Add your Groq API key to .env.local" },
       { status: 500 }
     );
   }
@@ -225,75 +264,81 @@ export async function POST(request: Request) {
       };
 
       try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-        const model = genAI.getGenerativeModel({
-          model: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
-          systemInstruction: SYSTEM_PROMPT,
-          tools: [{ functionDeclarations: GEMINI_TOOLS }],
-        });
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
+        const modelId = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
 
-        // Convert messages to Gemini format
-        const geminiHistory: Content[] = [];
-        for (const m of messages.slice(0, -1)) {
-          geminiHistory.push({
-            role: m.role === "user" ? "user" : "model",
-            parts: [{ text: m.content }],
-          });
-        }
+        // Build message history in OpenAI format
+        const groqMessages: Groq.Chat.ChatCompletionMessageParam[] = [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...messages.map((m: { role: string; content: string }) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+          })),
+        ];
 
-        const lastUserMsg = messages[messages.length - 1];
-        const chat = model.startChat({ history: geminiHistory });
-
-        let response = await chat.sendMessage(lastUserMsg.content);
-        let candidate = response.response.candidates?.[0];
-
-        // Tool use loop — execute function calls until the model gives a text response
         const MAX_TOOL_ROUNDS = 5;
         let round = 0;
 
-        while (candidate && round < MAX_TOOL_ROUNDS) {
-          const functionCalls = candidate.content?.parts?.filter(
-            (p: Part) => "functionCall" in p
-          );
+        while (round < MAX_TOOL_ROUNDS) {
+          const response = await groq.chat.completions.create({
+            model: modelId,
+            messages: groqMessages,
+            tools: TOOLS,
+            tool_choice: "auto",
+            max_tokens: 4096,
+          });
 
-          if (!functionCalls || functionCalls.length === 0) break;
+          const choice = response.choices[0];
+          if (!choice) break;
 
-          const functionResponses: Part[] = [];
+          const assistantMsg = choice.message;
 
-          for (const part of functionCalls) {
-            if (!("functionCall" in part) || !part.functionCall) continue;
-            const { name, args } = part.functionCall;
+          // If the model wants to call tools
+          if (assistantMsg.tool_calls && assistantMsg.tool_calls.length > 0) {
+            // Send any partial text the model included alongside tool calls
+            if (assistantMsg.content) {
+              send({ type: "message", delta: assistantMsg.content });
+            }
 
-            send({ type: "tool_call", name });
-            const result = await executeSapTool(name, (args ?? {}) as Record<string, unknown>);
-            send({ type: "tool_result", name });
+            // Add the assistant message (with tool_calls) to history
+            groqMessages.push(assistantMsg);
 
-            functionResponses.push({
-              functionResponse: {
-                name,
-                response: result as object,
-              },
-            });
+            // Execute each tool call and add results
+            for (const toolCall of assistantMsg.tool_calls) {
+              const fnName = toolCall.function.name;
+              let fnArgs: Record<string, unknown> = {};
+              try {
+                fnArgs = JSON.parse(toolCall.function.arguments || "{}");
+              } catch {
+                // invalid JSON args — use empty
+              }
+
+              send({ type: "tool_call", name: fnName, id: toolCall.id });
+              const result = await executeSapTool(fnName, fnArgs);
+              send({ type: "tool_result", name: fnName, id: toolCall.id });
+
+              groqMessages.push({
+                role: "tool",
+                tool_call_id: toolCall.id,
+                content: JSON.stringify(result),
+              });
+            }
+
+            round++;
+            continue;
           }
 
-          // Send function results back to Gemini
-          response = await chat.sendMessage(functionResponses);
-          candidate = response.response.candidates?.[0];
-          round++;
-        }
-
-        // Extract and stream the final text response
-        const textParts = candidate?.content?.parts?.filter((p: Part) => "text" in p) ?? [];
-        const fullText = textParts.map((p: Part) => ("text" in p ? p.text : "")).join("");
-
-        if (fullText) {
-          // Stream in chunks for a smooth UI experience
-          const chunkSize = 40;
-          for (let i = 0; i < fullText.length; i += chunkSize) {
-            send({ type: "message", delta: fullText.slice(i, i + chunkSize) });
+          // No tool calls — this is the final text response
+          const fullText = assistantMsg.content ?? "";
+          if (fullText) {
+            const chunkSize = 40;
+            for (let i = 0; i < fullText.length; i += chunkSize) {
+              send({ type: "message", delta: fullText.slice(i, i + chunkSize) });
+            }
+          } else {
+            send({ type: "message", delta: "I wasn't able to generate a response. Please try rephrasing your question." });
           }
-        } else {
-          send({ type: "message", delta: "I wasn't able to generate a response. Please try rephrasing your question." });
+          break;
         }
 
         send({ type: "done" });

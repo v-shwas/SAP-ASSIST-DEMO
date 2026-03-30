@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(grep -r GoogleGenerativeAI c:UsersvishwDesktopGenAISAP-ASSIST-DEMO --include=*.ts --include=*.tsx --include=*.js)",
+      "Bash(grep -r generative-ai c:UsersvishwDesktopGenAISAP-ASSIST-DEMO --include=*.ts --include=*.tsx --include=*.js --include=*.json)",
+      "Bash(grep -l \"GEMINI\\\\|gemini\" \"c:\\\\Users\\\\vishw\\\\Desktop\\\\GenAI\\\\SAP-ASSIST-DEMO\"/.env*)"
     ]
   }
 }
