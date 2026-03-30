@@ -39,7 +39,7 @@ const TOOLS: Groq.Chat.ChatCompletionTool[] = [
         properties: {
           period: { type: "string", description: "Period in YYYY-QN or YYYY-MM format" },
           dimension: { type: "string", description: "Grouping dimension: product, customer, region, or plant" },
-          top_n: { type: "number", description: "Return top N results (default 7)" },
+          top_n: { type: "string", description: "Return top N results (default 7), pass as number string e.g. '7'" },
         },
       },
     },
@@ -83,7 +83,7 @@ const TOOLS: Groq.Chat.ChatCompletionTool[] = [
         properties: {
           order_id: { type: "string", description: "Specific order ID, or omit for recent orders" },
           status_filter: { type: "string", description: "Filter: open, delivered, billed, or all" },
-          limit: { type: "number", description: "Number of orders to return (default 10)" },
+          limit: { type: "string", description: "Number of orders to return (default 10), pass as number string" },
         },
       },
     },
@@ -126,7 +126,7 @@ const TOOLS: Groq.Chat.ChatCompletionTool[] = [
         properties: {
           material: { type: "string", description: "Material number or 'all'" },
           plant: { type: "string", description: "Plant code or 'all'" },
-          alert_only: { type: "boolean", description: "If true, return only items with alerts" },
+          alert_only: { type: "string", description: "If 'true', return only items with alerts" },
         },
       },
     },
@@ -140,7 +140,7 @@ const TOOLS: Groq.Chat.ChatCompletionTool[] = [
         type: "object",
         properties: {
           vendor_id: { type: "string", description: "Vendor ID or omit for all" },
-          include_performance: { type: "boolean", description: "Include delivery reliability and quality scores" },
+          include_performance: { type: "string", description: "If 'true', include delivery reliability and quality scores" },
         },
       },
     },
@@ -154,7 +154,7 @@ const TOOLS: Groq.Chat.ChatCompletionTool[] = [
         type: "object",
         properties: {
           material: { type: "string", description: "Material number" },
-          horizon_months: { type: "number", description: "Forecast horizon in months (default 3)" },
+          horizon_months: { type: "string", description: "Forecast horizon in months (default 3), pass as number string" },
           region: { type: "string", description: "Region filter" },
         },
       },
@@ -185,7 +185,7 @@ const TOOLS: Groq.Chat.ChatCompletionTool[] = [
         properties: {
           period: { type: "string", description: "GST return period e.g. 'Mar-2026'" },
           gstin: { type: "string", description: "GSTIN number, or omit for all" },
-          mismatch_only: { type: "boolean", description: "Return only mismatched items" },
+          mismatch_only: { type: "string", description: "If 'true', return only mismatched items" },
         },
       },
     },
@@ -198,7 +198,7 @@ const TOOLS: Groq.Chat.ChatCompletionTool[] = [
       parameters: {
         type: "object",
         properties: {
-          days: { type: "number", description: "Forecast horizon in days (default 60)" },
+          days: { type: "string", description: "Forecast horizon in days (default 60), pass as number string" },
           drill_down: { type: "string", description: "Drill down: customer or region" },
         },
       },
@@ -218,6 +218,21 @@ const TOOLS: Groq.Chat.ChatCompletionTool[] = [
     },
   },
 ];
+
+/** Coerce string values back to numbers/booleans for the data layer */
+function coerceArgs(args: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(args)) {
+    if (typeof v === "string") {
+      if (v === "true") { out[k] = true; continue; }
+      if (v === "false") { out[k] = false; continue; }
+      const n = Number(v);
+      if (!isNaN(n) && v.trim() !== "") { out[k] = n; continue; }
+    }
+    out[k] = v;
+  }
+  return out;
+}
 
 function hasGroq(): boolean {
   const key = process.env.GROQ_API_KEY ?? "";
@@ -314,7 +329,7 @@ export async function POST(request: Request) {
               }
 
               send({ type: "tool_call", name: fnName, id: toolCall.id });
-              const result = await executeSapTool(fnName, fnArgs);
+              const result = await executeSapTool(fnName, coerceArgs(fnArgs));
               send({ type: "tool_result", name: fnName, id: toolCall.id });
 
               groqMessages.push({

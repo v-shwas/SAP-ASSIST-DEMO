@@ -4,7 +4,8 @@
       "Bash(node -e \":*)",
       "Bash(grep -r GoogleGenerativeAI c:UsersvishwDesktopGenAISAP-ASSIST-DEMO --include=*.ts --include=*.tsx --include=*.js)",
       "Bash(grep -r generative-ai c:UsersvishwDesktopGenAISAP-ASSIST-DEMO --include=*.ts --include=*.tsx --include=*.js --include=*.json)",
-      "Bash(grep -l \"GEMINI\\\\|gemini\" \"c:\\\\Users\\\\vishw\\\\Desktop\\\\GenAI\\\\SAP-ASSIST-DEMO\"/.env*)"
+      "Bash(grep -l \"GEMINI\\\\|gemini\" \"c:\\\\Users\\\\vishw\\\\Desktop\\\\GenAI\\\\SAP-ASSIST-DEMO\"/.env*)",
+      "Bash(node -e \"require\\(''dotenv''\\).config\\({ path: ''.env.local'' }\\); console.log\\(''DATABASE_URL set:'', !!process.env.DATABASE_URL, process.env.DATABASE_URL?.substring\\(0, 30\\) + ''...''\\)\")"
     ]
   }
 }
