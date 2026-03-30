@@ -280,7 +280,8 @@ export async function POST(request: Request) {
 
       try {
         const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
-        const modelId = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
+        const modelId = process.env.GROQ_MODEL ?? "meta-llama/llama-4-scout-17b-16e-instruct";
+        const supportsParallelToolCalls = !modelId.includes("llama-3.3");
 
         // Build message history in OpenAI format
         const groqMessages: Groq.Chat.ChatCompletionMessageParam[] = [
@@ -300,6 +301,7 @@ export async function POST(request: Request) {
             messages: groqMessages,
             tools: TOOLS,
             tool_choice: "auto",
+            parallel_tool_calls: supportsParallelToolCalls,
             max_tokens: 4096,
           });
 
