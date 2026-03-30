@@ -101,7 +101,11 @@ export default function ChatPage() {
           }),
         });
 
-        if (!res.ok || !res.body) throw new Error("Request failed");
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => null);
+          throw new Error(errBody?.error ?? `Request failed (${res.status})`);
+        }
+        if (!res.body) throw new Error("No response body");
 
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
@@ -162,8 +166,11 @@ export default function ChatPage() {
         if (convId && assistantContent) {
           await persistMessage(convId, "assistant", assistantContent);
         }
-      } catch {
-        const errMsg = "Sorry, something went wrong. Please try again.";
+      } catch (err) {
+        console.error("[chat] error:", err);
+        const errMsg = err instanceof Error && err.message !== "Request failed"
+          ? `Error: ${err.message}`
+          : "Sorry, something went wrong. Please try again.";
         setMessages((prev) =>
           prev.map((m) => (m.id === assistantId ? { ...m, content: errMsg } : m))
         );

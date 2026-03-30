@@ -300,8 +300,10 @@ export async function POST(request: Request) {
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
       } catch (err) {
         console.error("[chat/route] error:", err);
-        const message = err instanceof Error ? err.message : "An error occurred processing your request.";
-        send({ type: "error", message });
+        const message = err instanceof Error
+          ? `${err.message}${err.cause ? ` (cause: ${err.cause})` : ""}`
+          : "An error occurred processing your request.";
+        send({ type: "message", delta: `**Error:** ${message}` });
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
       } finally {
         controller.close();
