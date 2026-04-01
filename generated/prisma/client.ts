@@ -67,57 +67,117 @@ export type Message = Prisma.MessageModel
  */
 export type ApiKey = Prisma.ApiKeyModel
 /**
- * Model SapProduct
+ * Model BusinessRisk
  * 
  */
-export type SapProduct = Prisma.SapProductModel
+export type BusinessRisk = Prisma.BusinessRiskModel
 /**
- * Model SapCustomer
+ * Model CashFlowSummary
  * 
  */
-export type SapCustomer = Prisma.SapCustomerModel
+export type CashFlowSummary = Prisma.CashFlowSummaryModel
 /**
- * Model SapOrder
+ * Model Company
  * 
  */
-export type SapOrder = Prisma.SapOrderModel
+export type Company = Prisma.CompanyModel
 /**
- * Model SapShipment
+ * Model CostElement
  * 
  */
-export type SapShipment = Prisma.SapShipmentModel
+export type CostElement = Prisma.CostElementModel
 /**
- * Model SapInventory
+ * Model Customer
  * 
  */
-export type SapInventory = Prisma.SapInventoryModel
+export type Customer = Prisma.CustomerModel
 /**
- * Model SapSupplier
+ * Model DemandForecast
  * 
  */
-export type SapSupplier = Prisma.SapSupplierModel
+export type DemandForecast = Prisma.DemandForecastModel
 /**
- * Model SapRevenue
+ * Model GstRecord
  * 
  */
-export type SapRevenue = Prisma.SapRevenueModel
+export type GstRecord = Prisma.GstRecordModel
 /**
- * Model SapGstRecord
+ * Model InventoryItem
  * 
  */
-export type SapGstRecord = Prisma.SapGstRecordModel
+export type InventoryItem = Prisma.InventoryItemModel
 /**
- * Model SapSalesOrg
+ * Model Plant
  * 
  */
-export type SapSalesOrg = Prisma.SapSalesOrgModel
+export type Plant = Prisma.PlantModel
 /**
- * Model SapPlant
+ * Model PlantSummary
  * 
  */
-export type SapPlant = Prisma.SapPlantModel
+export type PlantSummary = Prisma.PlantSummaryModel
 /**
- * Model SapRiskRegion
+ * Model Product
  * 
  */
-export type SapRiskRegion = Prisma.SapRiskRegionModel
+export type Product = Prisma.ProductModel
+/**
+ * Model ProfitabilityByRegion
+ * 
+ */
+export type ProfitabilityByRegion = Prisma.ProfitabilityByRegionModel
+/**
+ * Model ProfitabilityBySegment
+ * 
+ */
+export type ProfitabilityBySegment = Prisma.ProfitabilityBySegmentModel
+/**
+ * Model ProfitabilityRecord
+ * 
+ */
+export type ProfitabilityRecord = Prisma.ProfitabilityRecordModel
+/**
+ * Model Receivable
+ * 
+ */
+export type Receivable = Prisma.ReceivableModel
+/**
+ * Model RegionRisk
+ * 
+ */
+export type RegionRisk = Prisma.RegionRiskModel
+/**
+ * Model ReturnOrder
+ * 
+ */
+export type ReturnOrder = Prisma.ReturnOrderModel
+/**
+ * Model RevenueRecord
+ * 
+ */
+export type RevenueRecord = Prisma.RevenueRecordModel
+/**
+ * Model SalesOrder
+ * 
+ */
+export type SalesOrder = Prisma.SalesOrderModel
+/**
+ * Model SalesOrg
+ * 
+ */
+export type SalesOrg = Prisma.SalesOrgModel
+/**
+ * Model Shipment
+ * 
+ */
+export type Shipment = Prisma.ShipmentModel
+/**
+ * Model Supplier
+ * 
+ */
+export type Supplier = Prisma.SupplierModel
+/**
+ * Model UsageRecord
+ * 
+ */
+export type UsageRecord = Prisma.UsageRecordModel

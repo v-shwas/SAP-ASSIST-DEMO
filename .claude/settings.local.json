@@ -6,7 +6,9 @@
       "Bash(grep -r generative-ai c:UsersvishwDesktopGenAISAP-ASSIST-DEMO --include=*.ts --include=*.tsx --include=*.js --include=*.json)",
       "Bash(grep -l \"GEMINI\\\\|gemini\" \"c:\\\\Users\\\\vishw\\\\Desktop\\\\GenAI\\\\SAP-ASSIST-DEMO\"/.env*)",
       "Bash(node -e \"require\\(''dotenv''\\).config\\({ path: ''.env.local'' }\\); console.log\\(''DATABASE_URL set:'', !!process.env.DATABASE_URL, process.env.DATABASE_URL?.substring\\(0, 30\\) + ''...''\\)\")",
-      "Bash(node -e \"const g = require\\(''@google/generative-ai''\\); console.log\\(Object.keys\\(g\\).filter\\(k => k.includes\\(''Schema''\\) || k.includes\\(''Type''\\)\\)\\)\")"
+      "Bash(node -e \"const g = require\\(''@google/generative-ai''\\); console.log\\(Object.keys\\(g\\).filter\\(k => k.includes\\(''Schema''\\) || k.includes\\(''Type''\\)\\)\\)\")",
+      "Bash(node -e ':*)",
+      "Bash(npx dotenv:*)"
     ]
   }
 }

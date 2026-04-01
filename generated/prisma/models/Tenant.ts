@@ -32,6 +32,10 @@ export type TenantMinAggregateOutputType = {
   plan: $Enums.Plan | null
   createdAt: Date | null
   updatedAt: Date | null
+  stripeCurrentPeriodEnd: Date | null
+  stripeCustomerId: string | null
+  stripePriceId: string | null
+  stripeSubscriptionId: string | null
 }
 
 export type TenantMaxAggregateOutputType = {
@@ -42,6 +46,10 @@ export type TenantMaxAggregateOutputType = {
   plan: $Enums.Plan | null
   createdAt: Date | null
   updatedAt: Date | null
+  stripeCurrentPeriodEnd: Date | null
+  stripeCustomerId: string | null
+  stripePriceId: string | null
+  stripeSubscriptionId: string | null
 }
 
 export type TenantCountAggregateOutputType = {
@@ -53,6 +61,10 @@ export type TenantCountAggregateOutputType = {
   sapConfig: number
   createdAt: number
   updatedAt: number
+  stripeCurrentPeriodEnd: number
+  stripeCustomerId: number
+  stripePriceId: number
+  stripeSubscriptionId: number
   _all: number
 }
 
@@ -65,6 +77,10 @@ export type TenantMinAggregateInputType = {
   plan?: true
   createdAt?: true
   updatedAt?: true
+  stripeCurrentPeriodEnd?: true
+  stripeCustomerId?: true
+  stripePriceId?: true
+  stripeSubscriptionId?: true
 }
 
 export type TenantMaxAggregateInputType = {
@@ -75,6 +91,10 @@ export type TenantMaxAggregateInputType = {
   plan?: true
   createdAt?: true
   updatedAt?: true
+  stripeCurrentPeriodEnd?: true
+  stripeCustomerId?: true
+  stripePriceId?: true
+  stripeSubscriptionId?: true
 }
 
 export type TenantCountAggregateInputType = {
@@ -86,6 +106,10 @@ export type TenantCountAggregateInputType = {
   sapConfig?: true
   createdAt?: true
   updatedAt?: true
+  stripeCurrentPeriodEnd?: true
+  stripeCustomerId?: true
+  stripePriceId?: true
+  stripeSubscriptionId?: true
   _all?: true
 }
 
@@ -170,6 +194,10 @@ export type TenantGroupByOutputType = {
   sapConfig: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
+  stripeCurrentPeriodEnd: Date | null
+  stripeCustomerId: string | null
+  stripePriceId: string | null
+  stripeSubscriptionId: string | null
   _count: TenantCountAggregateOutputType | null
   _min: TenantMinAggregateOutputType | null
   _max: TenantMaxAggregateOutputType | null
@@ -202,9 +230,14 @@ export type TenantWhereInput = {
   sapConfig?: Prisma.JsonNullableFilter<"Tenant">
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
-  users?: Prisma.UserListRelationFilter
-  conversations?: Prisma.ConversationListRelationFilter
+  stripeCurrentPeriodEnd?: Prisma.DateTimeNullableFilter<"Tenant"> | Date | string | null
+  stripeCustomerId?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  stripePriceId?: Prisma.StringNullableFilter<"Tenant"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableFilter<"Tenant"> | string | null
   apiKeys?: Prisma.ApiKeyListRelationFilter
+  conversations?: Prisma.ConversationListRelationFilter
+  UsageRecord?: Prisma.UsageRecordListRelationFilter
+  users?: Prisma.UserListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -216,15 +249,22 @@ export type TenantOrderByWithRelationInput = {
   sapConfig?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  users?: Prisma.UserOrderByRelationAggregateInput
-  conversations?: Prisma.ConversationOrderByRelationAggregateInput
+  stripeCurrentPeriodEnd?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
   apiKeys?: Prisma.ApiKeyOrderByRelationAggregateInput
+  conversations?: Prisma.ConversationOrderByRelationAggregateInput
+  UsageRecord?: Prisma.UsageRecordOrderByRelationAggregateInput
+  users?: Prisma.UserOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   clerkOrgId?: string
   slug?: string
+  stripeCustomerId?: string
+  stripeSubscriptionId?: string
   AND?: Prisma.TenantWhereInput | Prisma.TenantWhereInput[]
   OR?: Prisma.TenantWhereInput[]
   NOT?: Prisma.TenantWhereInput | Prisma.TenantWhereInput[]
@@ -233,10 +273,13 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   sapConfig?: Prisma.JsonNullableFilter<"Tenant">
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
-  users?: Prisma.UserListRelationFilter
-  conversations?: Prisma.ConversationListRelationFilter
+  stripeCurrentPeriodEnd?: Prisma.DateTimeNullableFilter<"Tenant"> | Date | string | null
+  stripePriceId?: Prisma.StringNullableFilter<"Tenant"> | string | null
   apiKeys?: Prisma.ApiKeyListRelationFilter
-}, "id" | "clerkOrgId" | "slug">
+  conversations?: Prisma.ConversationListRelationFilter
+  UsageRecord?: Prisma.UsageRecordListRelationFilter
+  users?: Prisma.UserListRelationFilter
+}, "id" | "clerkOrgId" | "slug" | "stripeCustomerId" | "stripeSubscriptionId">
 
 export type TenantOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -247,6 +290,10 @@ export type TenantOrderByWithAggregationInput = {
   sapConfig?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  stripeCurrentPeriodEnd?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TenantCountOrderByAggregateInput
   _max?: Prisma.TenantMaxOrderByAggregateInput
   _min?: Prisma.TenantMinOrderByAggregateInput
@@ -264,6 +311,10 @@ export type TenantScalarWhereWithAggregatesInput = {
   sapConfig?: Prisma.JsonNullableWithAggregatesFilter<"Tenant">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Tenant"> | Date | string
+  stripeCurrentPeriodEnd?: Prisma.DateTimeNullableWithAggregatesFilter<"Tenant"> | Date | string | null
+  stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  stripePriceId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
+  stripeSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
 }
 
 export type TenantCreateInput = {
@@ -275,9 +326,14 @@ export type TenantCreateInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  users?: Prisma.UserCreateNestedManyWithoutTenantInput
-  conversations?: Prisma.ConversationCreateNestedManyWithoutTenantInput
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutTenantInput
+  UsageRecord?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -289,9 +345,14 @@ export type TenantUncheckedCreateInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutTenantInput
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutTenantInput
+  UsageRecord?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -303,9 +364,14 @@ export type TenantUpdateInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
-  conversations?: Prisma.ConversationUpdateManyWithoutTenantNestedInput
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutTenantNestedInput
+  UsageRecord?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -317,9 +383,14 @@ export type TenantUncheckedUpdateInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutTenantNestedInput
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutTenantNestedInput
+  UsageRecord?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -331,6 +402,10 @@ export type TenantCreateManyInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
 }
 
 export type TenantUpdateManyMutationInput = {
@@ -342,6 +417,10 @@ export type TenantUpdateManyMutationInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TenantUncheckedUpdateManyInput = {
@@ -353,6 +432,10 @@ export type TenantUncheckedUpdateManyInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TenantCountOrderByAggregateInput = {
@@ -364,6 +447,10 @@ export type TenantCountOrderByAggregateInput = {
   sapConfig?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  stripeCurrentPeriodEnd?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
 }
 
 export type TenantMaxOrderByAggregateInput = {
@@ -374,6 +461,10 @@ export type TenantMaxOrderByAggregateInput = {
   plan?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  stripeCurrentPeriodEnd?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
 }
 
 export type TenantMinOrderByAggregateInput = {
@@ -384,6 +475,10 @@ export type TenantMinOrderByAggregateInput = {
   plan?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  stripeCurrentPeriodEnd?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  stripeSubscriptionId?: Prisma.SortOrder
 }
 
 export type TenantScalarRelationFilter = {
@@ -401,6 +496,14 @@ export type EnumPlanFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type TenantCreateNestedOneWithoutUsersInput = {
@@ -445,6 +548,20 @@ export type TenantUpdateOneRequiredWithoutApiKeysNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutApiKeysInput, Prisma.TenantUpdateWithoutApiKeysInput>, Prisma.TenantUncheckedUpdateWithoutApiKeysInput>
 }
 
+export type TenantCreateNestedOneWithoutUsageRecordInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutUsageRecordInput, Prisma.TenantUncheckedCreateWithoutUsageRecordInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutUsageRecordInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutUsageRecordNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutUsageRecordInput, Prisma.TenantUncheckedCreateWithoutUsageRecordInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutUsageRecordInput
+  upsert?: Prisma.TenantUpsertWithoutUsageRecordInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutUsageRecordInput, Prisma.TenantUpdateWithoutUsageRecordInput>, Prisma.TenantUncheckedUpdateWithoutUsageRecordInput>
+}
+
 export type TenantCreateWithoutUsersInput = {
   id?: string
   clerkOrgId: string
@@ -454,8 +571,13 @@ export type TenantCreateWithoutUsersInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  conversations?: Prisma.ConversationCreateNestedManyWithoutTenantInput
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutTenantInput
+  UsageRecord?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsersInput = {
@@ -467,8 +589,13 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutTenantInput
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutTenantInput
+  UsageRecord?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsersInput = {
@@ -496,8 +623,13 @@ export type TenantUpdateWithoutUsersInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversations?: Prisma.ConversationUpdateManyWithoutTenantNestedInput
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutTenantNestedInput
+  UsageRecord?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsersInput = {
@@ -509,8 +641,13 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutTenantNestedInput
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutTenantNestedInput
+  UsageRecord?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutConversationsInput = {
@@ -522,8 +659,13 @@ export type TenantCreateWithoutConversationsInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
   apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
+  UsageRecord?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutConversationsInput = {
@@ -535,8 +677,13 @@ export type TenantUncheckedCreateWithoutConversationsInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
   apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
+  UsageRecord?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutConversationsInput = {
@@ -564,8 +711,13 @@ export type TenantUpdateWithoutConversationsInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
+  UsageRecord?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutConversationsInput = {
@@ -577,8 +729,13 @@ export type TenantUncheckedUpdateWithoutConversationsInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
+  UsageRecord?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutApiKeysInput = {
@@ -590,8 +747,13 @@ export type TenantCreateWithoutApiKeysInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
   conversations?: Prisma.ConversationCreateNestedManyWithoutTenantInput
+  UsageRecord?: Prisma.UsageRecordCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutApiKeysInput = {
@@ -603,8 +765,13 @@ export type TenantUncheckedCreateWithoutApiKeysInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutTenantInput
+  UsageRecord?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutApiKeysInput = {
@@ -632,8 +799,13 @@ export type TenantUpdateWithoutApiKeysInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.ConversationUpdateManyWithoutTenantNestedInput
+  UsageRecord?: Prisma.UsageRecordUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutApiKeysInput = {
@@ -645,8 +817,101 @@ export type TenantUncheckedUpdateWithoutApiKeysInput = {
   sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutTenantNestedInput
+  UsageRecord?: Prisma.UsageRecordUncheckedUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutUsageRecordInput = {
+  id?: string
+  clerkOrgId: string
+  name: string
+  slug: string
+  plan?: $Enums.Plan
+  sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
+  apiKeys?: Prisma.ApiKeyCreateNestedManyWithoutTenantInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutUsageRecordInput = {
+  id?: string
+  clerkOrgId: string
+  name: string
+  slug: string
+  plan?: $Enums.Plan
+  sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  stripeCurrentPeriodEnd?: Date | string | null
+  stripeCustomerId?: string | null
+  stripePriceId?: string | null
+  stripeSubscriptionId?: string | null
+  apiKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutTenantInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutUsageRecordInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutUsageRecordInput, Prisma.TenantUncheckedCreateWithoutUsageRecordInput>
+}
+
+export type TenantUpsertWithoutUsageRecordInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutUsageRecordInput, Prisma.TenantUncheckedUpdateWithoutUsageRecordInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutUsageRecordInput, Prisma.TenantUncheckedCreateWithoutUsageRecordInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutUsageRecordInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutUsageRecordInput, Prisma.TenantUncheckedUpdateWithoutUsageRecordInput>
+}
+
+export type TenantUpdateWithoutUsageRecordInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkOrgId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.EnumPlanFieldUpdateOperationsInput | $Enums.Plan
+  sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apiKeys?: Prisma.ApiKeyUpdateManyWithoutTenantNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutUsageRecordInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkOrgId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.EnumPlanFieldUpdateOperationsInput | $Enums.Plan
+  sapConfig?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  stripeCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apiKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutTenantNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -655,15 +920,17 @@ export type TenantUncheckedUpdateWithoutApiKeysInput = {
  */
 
 export type TenantCountOutputType = {
-  users: number
-  conversations: number
   apiKeys: number
+  conversations: number
+  UsageRecord: number
+  users: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  users?: boolean | TenantCountOutputTypeCountUsersArgs
-  conversations?: boolean | TenantCountOutputTypeCountConversationsArgs
   apiKeys?: boolean | TenantCountOutputTypeCountApiKeysArgs
+  conversations?: boolean | TenantCountOutputTypeCountConversationsArgs
+  UsageRecord?: boolean | TenantCountOutputTypeCountUsageRecordArgs
+  users?: boolean | TenantCountOutputTypeCountUsersArgs
 }
 
 /**
@@ -679,8 +946,8 @@ export type TenantCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
 /**
  * TenantCountOutputType without action
  */
-export type TenantCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserWhereInput
+export type TenantCountOutputTypeCountApiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApiKeyWhereInput
 }
 
 /**
@@ -693,8 +960,15 @@ export type TenantCountOutputTypeCountConversationsArgs<ExtArgs extends runtime.
 /**
  * TenantCountOutputType without action
  */
-export type TenantCountOutputTypeCountApiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ApiKeyWhereInput
+export type TenantCountOutputTypeCountUsageRecordArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UsageRecordWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserWhereInput
 }
 
 
@@ -707,9 +981,14 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   sapConfig?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
-  conversations?: boolean | Prisma.Tenant$conversationsArgs<ExtArgs>
+  stripeCurrentPeriodEnd?: boolean
+  stripeCustomerId?: boolean
+  stripePriceId?: boolean
+  stripeSubscriptionId?: boolean
   apiKeys?: boolean | Prisma.Tenant$apiKeysArgs<ExtArgs>
+  conversations?: boolean | Prisma.Tenant$conversationsArgs<ExtArgs>
+  UsageRecord?: boolean | Prisma.Tenant$UsageRecordArgs<ExtArgs>
+  users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -722,6 +1001,10 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   sapConfig?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  stripeCurrentPeriodEnd?: boolean
+  stripeCustomerId?: boolean
+  stripePriceId?: boolean
+  stripeSubscriptionId?: boolean
 }, ExtArgs["result"]["tenant"]>
 
 export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -733,6 +1016,10 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   sapConfig?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  stripeCurrentPeriodEnd?: boolean
+  stripeCustomerId?: boolean
+  stripePriceId?: boolean
+  stripeSubscriptionId?: boolean
 }, ExtArgs["result"]["tenant"]>
 
 export type TenantSelectScalar = {
@@ -744,13 +1031,18 @@ export type TenantSelectScalar = {
   sapConfig?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  stripeCurrentPeriodEnd?: boolean
+  stripeCustomerId?: boolean
+  stripePriceId?: boolean
+  stripeSubscriptionId?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerkOrgId" | "name" | "slug" | "plan" | "sapConfig" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerkOrgId" | "name" | "slug" | "plan" | "sapConfig" | "createdAt" | "updatedAt" | "stripeCurrentPeriodEnd" | "stripeCustomerId" | "stripePriceId" | "stripeSubscriptionId", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
-  conversations?: boolean | Prisma.Tenant$conversationsArgs<ExtArgs>
   apiKeys?: boolean | Prisma.Tenant$apiKeysArgs<ExtArgs>
+  conversations?: boolean | Prisma.Tenant$conversationsArgs<ExtArgs>
+  UsageRecord?: boolean | Prisma.Tenant$UsageRecordArgs<ExtArgs>
+  users?: boolean | Prisma.Tenant$usersArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -759,9 +1051,10 @@ export type TenantIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Tenant"
   objects: {
-    users: Prisma.$UserPayload<ExtArgs>[]
-    conversations: Prisma.$ConversationPayload<ExtArgs>[]
     apiKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
+    conversations: Prisma.$ConversationPayload<ExtArgs>[]
+    UsageRecord: Prisma.$UsageRecordPayload<ExtArgs>[]
+    users: Prisma.$UserPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -772,6 +1065,10 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     sapConfig: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
+    stripeCurrentPeriodEnd: Date | null
+    stripeCustomerId: string | null
+    stripePriceId: string | null
+    stripeSubscriptionId: string | null
   }, ExtArgs["result"]["tenant"]>
   composites: {}
 }
@@ -1166,9 +1463,10 @@ readonly fields: TenantFieldRefs;
  */
 export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  users<T extends Prisma.Tenant$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  conversations<T extends Prisma.Tenant$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   apiKeys<T extends Prisma.Tenant$apiKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  conversations<T extends Prisma.Tenant$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  UsageRecord<T extends Prisma.Tenant$UsageRecordArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$UsageRecordArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  users<T extends Prisma.Tenant$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1206,6 +1504,10 @@ export interface TenantFieldRefs {
   readonly sapConfig: Prisma.FieldRef<"Tenant", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Tenant", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Tenant", 'DateTime'>
+  readonly stripeCurrentPeriodEnd: Prisma.FieldRef<"Tenant", 'DateTime'>
+  readonly stripeCustomerId: Prisma.FieldRef<"Tenant", 'String'>
+  readonly stripePriceId: Prisma.FieldRef<"Tenant", 'String'>
+  readonly stripeSubscriptionId: Prisma.FieldRef<"Tenant", 'String'>
 }
     
 
@@ -1599,27 +1901,27 @@ export type TenantDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
- * Tenant.users
+ * Tenant.apiKeys
  */
-export type Tenant$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Tenant$apiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the ApiKey
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.ApiKeySelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the ApiKey
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.ApiKeyOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
-  cursor?: Prisma.UserWhereUniqueInput
+  include?: Prisma.ApiKeyInclude<ExtArgs> | null
+  where?: Prisma.ApiKeyWhereInput
+  orderBy?: Prisma.ApiKeyOrderByWithRelationInput | Prisma.ApiKeyOrderByWithRelationInput[]
+  cursor?: Prisma.ApiKeyWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  distinct?: Prisma.ApiKeyScalarFieldEnum | Prisma.ApiKeyScalarFieldEnum[]
 }
 
 /**
@@ -1647,27 +1949,51 @@ export type Tenant$conversationsArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
- * Tenant.apiKeys
+ * Tenant.UsageRecord
  */
-export type Tenant$apiKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Tenant$UsageRecordArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the ApiKey
+   * Select specific fields to fetch from the UsageRecord
    */
-  select?: Prisma.ApiKeySelect<ExtArgs> | null
+  select?: Prisma.UsageRecordSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the ApiKey
+   * Omit specific fields from the UsageRecord
    */
-  omit?: Prisma.ApiKeyOmit<ExtArgs> | null
+  omit?: Prisma.UsageRecordOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ApiKeyInclude<ExtArgs> | null
-  where?: Prisma.ApiKeyWhereInput
-  orderBy?: Prisma.ApiKeyOrderByWithRelationInput | Prisma.ApiKeyOrderByWithRelationInput[]
-  cursor?: Prisma.ApiKeyWhereUniqueInput
+  include?: Prisma.UsageRecordInclude<ExtArgs> | null
+  where?: Prisma.UsageRecordWhereInput
+  orderBy?: Prisma.UsageRecordOrderByWithRelationInput | Prisma.UsageRecordOrderByWithRelationInput[]
+  cursor?: Prisma.UsageRecordWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ApiKeyScalarFieldEnum | Prisma.ApiKeyScalarFieldEnum[]
+  distinct?: Prisma.UsageRecordScalarFieldEnum | Prisma.UsageRecordScalarFieldEnum[]
+}
+
+/**
+ * Tenant.users
+ */
+export type Tenant$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  cursor?: Prisma.UserWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
 }
 
 /**

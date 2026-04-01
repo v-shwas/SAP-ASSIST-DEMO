@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -11,65 +8,62 @@ datasource db {
 }
 
 model Tenant {
-  id         String  @id @default(cuid())
-  clerkOrgId String  @unique
-  name       String
-  slug       String  @unique
-  plan       Plan    @default(STARTER)
-  sapConfig  Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  users         User[]
-  conversations Conversation[]
-  apiKeys       ApiKey[]
+  id                     String         @id @default(cuid())
+  clerkOrgId             String         @unique
+  name                   String
+  slug                   String         @unique
+  plan                   Plan           @default(STARTER)
+  sapConfig              Json?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  stripeCurrentPeriodEnd DateTime?
+  stripeCustomerId       String?        @unique
+  stripePriceId          String?
+  stripeSubscriptionId   String?        @unique
+  apiKeys                ApiKey[]
+  conversations          Conversation[]
+  UsageRecord            UsageRecord[]
+  users                  User[]
 }
 
 model User {
-  id          String @id @default(cuid())
-  clerkUserId String @unique
-  tenantId    String
-  email       String
-  name        String?
-  role        Role   @default(MEMBER)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id            String         @id @default(cuid())
+  clerkUserId   String         @unique
+  tenantId      String
+  email         String
+  name          String?
+  role          Role           @default(MEMBER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   conversations Conversation[]
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
 }
 
 model Conversation {
-  id       String @id @default(cuid())
-  tenantId String
-  userId   String
-  title    String @default("New Conversation")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages Message[]
+  id        String    @id @default(cuid())
+  tenantId  String
+  userId    String
+  title     String    @default("New Conversation")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
 
   @@index([tenantId])
   @@index([userId])
 }
 
 model Message {
-  id             String      @id @default(cuid())
+  id             String       @id @default(cuid())
   conversationId String
   role           MessageRole
-  content        String      @db.Text
+  content        String
   toolCalls      Json?
-
-  createdAt DateTime @default(now())
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
 }
@@ -81,11 +75,384 @@ model ApiKey {
   keyHash   String    @unique
   lastUsed  DateTime?
   expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
+  @@index([tenantId])
+}
+
+model BusinessRisk {
+  id          String   @id
+  companyId   String
+  category    String
+  description String
+  severity    String
+  amount      Float
+  region      String?
+  createdAt   DateTime @default(now())
+  Company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model CashFlowSummary {
+  id         String   @id
+  companyId  String   @unique
+  periodDays Int      @default(60)
+  inflow     Float
+  outflow    Float
+  netGap     Float
+  createdAt  DateTime @default(now())
+  Company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id                     String                   @id
+  name                   String
+  industry               String
+  description            String?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  BusinessRisk           BusinessRisk[]
+  CashFlowSummary        CashFlowSummary?
+  CostElement            CostElement[]
+  Customer               Customer[]
+  DemandForecast         DemandForecast[]
+  GstRecord              GstRecord[]
+  InventoryItem          InventoryItem[]
+  Plant                  Plant[]
+  PlantSummary           PlantSummary[]
+  Product                Product[]
+  ProfitabilityByRegion  ProfitabilityByRegion[]
+  ProfitabilityBySegment ProfitabilityBySegment[]
+  ProfitabilityRecord    ProfitabilityRecord[]
+  Receivable             Receivable[]
+  RegionRisk             RegionRisk[]
+  ReturnOrder            ReturnOrder[]
+  RevenueRecord          RevenueRecord[]
+  SalesOrder             SalesOrder[]
+  SalesOrg               SalesOrg[]
+  Shipment               Shipment[]
+  Supplier               Supplier[]
+}
+
+model CostElement {
+  id          String   @id
+  companyId   String
+  period      String
+  element     String
+  actual      Float
+  planned     Float
+  variancePct Float
+  createdAt   DateTime @default(now())
+  Company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model Customer {
+  id          String        @id
+  companyId   String
+  name        String
+  segment     String
+  region      String
+  creditLimit Float         @default(0)
+  createdAt   DateTime      @default(now())
+  Company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Receivable  Receivable[]
+  ReturnOrder ReturnOrder[]
+  SalesOrder  SalesOrder[]
+
+  @@index([companyId])
+}
+
+model DemandForecast {
+  id              String   @id
+  companyId       String
+  productId       String
+  forecastRevenue Float
+  growthPct       Float
+  confidence      Float
+  createdAt       DateTime @default(now())
+  Company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, productId])
+  @@index([companyId])
+}
+
+model GstRecord {
+  id           String   @id
+  companyId    String
+  supplierId   String
+  period       String
+  invoiceValue Float
+  claimedItc   Float
+  eligibleItc  Float
+  mismatch     Float
+  status       String
+  createdAt    DateTime @default(now())
+  Company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Supplier     Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model InventoryItem {
+  id          String   @id
+  companyId   String
+  productId   String
+  plantId     String
+  stock       Int
+  safetyStock Int
+  value       Float
+  alert       Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  Company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Plant       Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  Product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, productId, plantId])
+  @@index([companyId])
+}
+
+model Plant {
+  id            String          @id
+  companyId     String
+  code          String
+  name          String
+  location      String
+  createdAt     DateTime        @default(now())
+  InventoryItem InventoryItem[]
+  Company       Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  PlantSummary  PlantSummary[]
+
+  @@index([companyId])
+}
+
+model PlantSummary {
+  id           String   @id
+  companyId    String
+  plantId      String
+  stockValue   Float
+  deadStockPct Float
+  overstockPct Float
+  stockoutRisk String
+  createdAt    DateTime @default(now())
+  Company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Plant        Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, plantId])
+  @@index([companyId])
+}
+
+model Product {
+  id                  String                @id
+  companyId           String
+  name                String
+  sku                 String
+  category            String
+  pricePerUnit        Float
+  unit                String                @default("Cases")
+  createdAt           DateTime              @default(now())
+  DemandForecast      DemandForecast[]
+  InventoryItem       InventoryItem[]
+  Company             Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  ProfitabilityRecord ProfitabilityRecord[]
+  ReturnOrder         ReturnOrder[]
+  SalesOrder          SalesOrder[]
+  Shipment            Shipment[]
+
+  @@index([companyId])
+}
+
+model ProfitabilityByRegion {
+  id        String   @id
+  companyId String
+  region    String
+  period    String
+  revenue   Float
+  marginPct Float
+  orders    Int
   createdAt DateTime @default(now())
+  Company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  @@index([companyId])
+}
 
+model ProfitabilityBySegment {
+  id              String   @id
+  companyId       String
+  segment         String
+  period          String
+  revenue         Float
+  marginPct       Float
+  varianceVsPlan  String
+  contributionPct Float
+  createdAt       DateTime @default(now())
+  Company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model ProfitabilityRecord {
+  id        String   @id
+  companyId String
+  productId String
+  period    String
+  revenue   Float
+  cost      Float
+  marginPct Float
+  orders    Int
+  createdAt DateTime @default(now())
+  Company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, productId, period])
+  @@index([companyId])
+}
+
+model Receivable {
+  id          String   @id
+  companyId   String
+  customerId  String
+  outstanding Float
+  agingDays   Int
+  riskLevel   String
+  createdAt   DateTime @default(now())
+  Company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, customerId])
+  @@index([companyId])
+}
+
+model RegionRisk {
+  id            String   @id
+  companyId     String
+  region        String
+  overdueAmount Float
+  avgDelayDays  Int
+  riskScore     String
+  keyRisk       String
+  createdAt     DateTime @default(now())
+  Company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model ReturnOrder {
+  id         String   @id
+  companyId  String
+  rmaId      String   @unique
+  orderId    String
+  customerId String
+  productId  String
+  reason     String
+  value      Float
+  status     String
+  createdAt  DateTime @default(now())
+  Company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model RevenueRecord {
+  id        String   @id
+  companyId String
+  period    String
+  revenue   Float
+  target    Float
+  yoyGrowth Float
+  region    String   @default("All")
+  createdAt DateTime @default(now())
+  Company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model SalesOrder {
+  id          String   @id
+  companyId   String
+  orderId     String   @unique
+  customerId  String
+  productId   String
+  value       Float
+  status      String
+  orderDate   DateTime
+  delayReason String?
+  createdAt   DateTime @default(now())
+  Company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  Product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model SalesOrg {
+  id              String   @id
+  companyId       String
+  code            String
+  name            String
+  forecastRevenue Float
+  growthPct       Float
+  confidence      Float
+  keyDriver       String
+  createdAt       DateTime @default(now())
+  Company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model Shipment {
+  id          String    @id
+  companyId   String
+  deliveryId  String    @unique
+  orderId     String
+  carrier     String
+  productId   String
+  status      String
+  eta         DateTime
+  actual      DateTime?
+  destination String
+  delayReason String?
+  delayDays   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  Company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model Supplier {
+  id           String      @id
+  companyId    String
+  name         String
+  category     String
+  location     String
+  onTimePct    Float       @default(0)
+  qualityScore Float       @default(0)
+  createdAt    DateTime    @default(now())
+  activePOs    Int         @default(0)
+  gstin        String?
+  GstRecord    GstRecord[]
+  Company      Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model UsageRecord {
+  id           String   @id
+  tenantId     String
+  date         DateTime @db.Date
+  chatMessages Int      @default(0)
+  toolCalls    Int      @default(0)
+  Tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, date])
   @@index([tenantId])
 }
 
@@ -105,158 +472,4 @@ enum MessageRole {
   user
   assistant
   system
-}
-
-// ─── SAP Demo Data Models (Tirupathi Oils) ───
-
-model SapProduct {
-  id        String @id @default(cuid())
-  code      String @unique
-  name      String
-  category  String @default("Edible Oil")
-  revenue   Float
-  cost      Float
-  marginPct Float
-  orders    Int
-
-  inventory SapInventory[]
-
-  @@map("sap_products")
-}
-
-model SapCustomer {
-  id          String  @id @default(cuid())
-  code        String  @unique
-  name        String
-  segment     String
-  gstin       String?
-  creditLimit Float
-  outstanding Float   @default(0)
-  agingDays   Int     @default(0)
-  riskLevel   String  @default("Low")
-
-  orders SapOrder[]
-
-  @@map("sap_customers")
-}
-
-model SapOrder {
-  id          String   @id @default(cuid())
-  orderId     String   @unique
-  customerId  String
-  product     String
-  value       Float
-  status      String
-  date        DateTime
-  delayReason String?
-
-  customer SapCustomer @relation(fields: [customerId], references: [id])
-  shipment SapShipment?
-
-  @@map("sap_orders")
-}
-
-model SapShipment {
-  id          String    @id @default(cuid())
-  deliveryId  String    @unique
-  orderId     String    @unique
-  carrier     String
-  status      String
-  product     String
-  eta         DateTime
-  actual      DateTime?
-  delayReason String?
-
-  order SapOrder @relation(fields: [orderId], references: [orderId])
-
-  @@map("sap_shipments")
-}
-
-model SapInventory {
-  id           String @id @default(cuid())
-  materialCode String
-  productId    String
-  plant        String
-  stock        Int
-  stockValue   Float
-  safetyStock  Int
-  coverageDays Int
-  unit         String @default("Cases")
-  aiSignal     String
-
-  product SapProduct @relation(fields: [productId], references: [id])
-
-  @@unique([materialCode, plant])
-  @@map("sap_inventory")
-}
-
-model SapSupplier {
-  id           String @id @default(cuid())
-  vendorId     String @unique
-  name         String
-  category     String
-  onTimePct    Float
-  qualityScore Float
-  activePos    Int
-
-  @@map("sap_suppliers")
-}
-
-model SapRevenue {
-  id        String @id @default(cuid())
-  period    String
-  revenue   Float
-  target    Float
-  yoyGrowth Float
-  type      String @default("monthly")
-
-  @@unique([period, type])
-  @@map("sap_revenue")
-}
-
-model SapGstRecord {
-  id          String @id @default(cuid())
-  gstin       String
-  party       String
-  booksAmount Float
-  gstPortal   Float
-  diff        Float
-  status      String
-  period      String
-
-  @@map("sap_gst_records")
-}
-
-model SapSalesOrg {
-  id              String @id @default(cuid())
-  code            String @unique
-  name            String
-  forecastRevenue Float
-  growthPct       Float
-  confidence      Float
-  keyDriver       String
-
-  @@map("sap_sales_orgs")
-}
-
-model SapPlant {
-  id           String @id @default(cuid())
-  code         String @unique
-  name         String
-  stockValue   Float
-  deadStockPct Float
-  overstockPct Float
-  stockoutRisk String
-
-  @@map("sap_plants")
-}
-
-model SapRiskRegion {
-  id            String @id @default(cuid())
-  region        String @unique
-  overdueAmount Float
-  avgDelayDays  Int
-  riskScore     String
-
-  @@map("sap_risk_regions")
 }
