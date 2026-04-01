@@ -4,7 +4,6 @@
  */
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { Pool } from "@neondatabase/serverless";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -17,9 +16,7 @@ export function getPrisma(): PrismaClient {
     if (!connectionString) {
       throw new Error("DATABASE_URL environment variable is not set");
     }
-    const pool = new Pool({ connectionString });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Neon Pool/PrismaNeon type mismatch across versions
-    const adapter = new PrismaNeon(pool as any);
+    const adapter = new PrismaNeon({ connectionString });
     global.__prisma = new PrismaClient({ adapter });
   }
   return global.__prisma;
