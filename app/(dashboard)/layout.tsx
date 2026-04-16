@@ -16,7 +16,7 @@ import {
   Layers,
   Settings,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -26,6 +26,7 @@ const navItems = [
     label: "EHS Health Status",
     icon: Activity,
     color: "text-emerald-400",
+    hoverColor: "group-hover:text-emerald-400",
     description: "Site-wide safety metrics",
   },
   {
@@ -33,6 +34,7 @@ const navItems = [
     label: "Policy & Documentation",
     icon: FileText,
     color: "text-blue-400",
+    hoverColor: "group-hover:text-blue-400",
     description: "RAG-powered policy hub",
   },
   {
@@ -40,6 +42,7 @@ const navItems = [
     label: "EHS Management",
     icon: Cpu,
     color: "text-violet-400",
+    hoverColor: "group-hover:text-violet-400",
     description: "Sensors & IoT monitoring",
   },
   {
@@ -47,6 +50,7 @@ const navItems = [
     label: "AI Recommendations",
     icon: Sparkles,
     color: "text-yellow-400",
+    hoverColor: "group-hover:text-yellow-400",
     description: "Intelligent safety insights",
   },
   {
@@ -54,6 +58,7 @@ const navItems = [
     label: "Carbon Credit Trading",
     icon: Leaf,
     color: "text-green-400",
+    hoverColor: "group-hover:text-green-400",
     description: "Peer-to-peer carbon exchange",
   },
   {
@@ -61,6 +66,7 @@ const navItems = [
     label: "Audit & Compliance",
     icon: ShieldCheck,
     color: "text-cyan-400",
+    hoverColor: "group-hover:text-cyan-400",
     description: "Governance & reporting",
   },
   {
@@ -68,6 +74,7 @@ const navItems = [
     label: "Disposal Analytics",
     icon: Trash2,
     color: "text-orange-400",
+    hoverColor: "group-hover:text-orange-400",
     description: "Vendor disposal tracking",
   },
   {
@@ -75,6 +82,7 @@ const navItems = [
     label: "Marketplace",
     icon: Store,
     color: "text-pink-400",
+    hoverColor: "group-hover:text-pink-400",
     description: "Extensions & integrations",
   },
 ];
@@ -94,7 +102,13 @@ function Sidebar({ className, onClose }: { className?: string; onClose?: () => v
           <span className="text-[10px] text-slate-400 tracking-wide uppercase">Environmental · Health · Safety</span>
         </div>
         {onClose && (
-          <Button variant="ghost" size="icon" className="ml-auto h-7 w-7 text-slate-400" onClick={onClose}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="ml-auto h-7 w-7 text-slate-400"
+            onClick={onClose}
+            aria-label="Close navigation"
+          >
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -108,7 +122,7 @@ function Sidebar({ className, onClose }: { className?: string; onClose?: () => v
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">
         {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}
@@ -121,7 +135,12 @@ function Sidebar({ className, onClose }: { className?: string; onClose?: () => v
                   : "text-slate-400 hover:bg-slate-900 hover:text-white"
               )}
             >
-              <item.icon className={cn("h-4 w-4 shrink-0 mt-0.5", isActive ? item.color : "text-slate-500 group-hover:" + item.color.replace("text-", ""))} />
+              <item.icon
+                className={cn(
+                  "h-4 w-4 shrink-0 mt-0.5",
+                  isActive ? item.color : cn("text-slate-500", item.hoverColor)
+                )}
+              />
               <div className="flex flex-col leading-tight min-w-0">
                 <span className="font-medium text-xs truncate">{item.label}</span>
                 <span className="text-[10px] text-slate-500 truncate">{item.description}</span>
@@ -135,6 +154,7 @@ function Sidebar({ className, onClose }: { className?: string; onClose?: () => v
       <div className="border-t border-slate-800 px-3 py-3">
         <Link
           href="/settings"
+          onClick={onClose}
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-900 hover:text-white transition-colors"
         >
           <Settings className="h-4 w-4 shrink-0" />
@@ -149,7 +169,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
-  const currentNav = navItems.find((n) => pathname.startsWith(n.href));
+  const currentNav = navItems.find(
+    (n) => pathname === n.href || pathname.startsWith(n.href + "/")
+  );
+
+  // Close sidebar on Escape key
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSidebarOpen(false);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [sidebarOpen]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
@@ -158,7 +190,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div
+          className="fixed inset-0 z-50 md:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+        >
           <div className="absolute inset-0 bg-black/60" onClick={() => setSidebarOpen(false)} />
           <Sidebar className="relative z-10 flex" onClose={() => setSidebarOpen(false)} />
         </div>
@@ -173,6 +210,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             size="icon"
             className="md:hidden h-8 w-8"
             onClick={() => setSidebarOpen(true)}
+            aria-label="Open navigation"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -191,7 +229,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Live
             </span>
-            <div className="h-7 w-7 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+            <div
+              className="h-7 w-7 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600"
+              role="img"
+              aria-label="User avatar"
+            >
               VP
             </div>
           </div>

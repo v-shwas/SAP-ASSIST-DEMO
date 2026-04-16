@@ -1,5 +1,7 @@
+import { type ReactNode } from "react";
 import { Cpu, Wifi, WifiOff, AlertTriangle, Thermometer, Wind, Droplets, Zap, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const sensors = [
   { id: "SNS-001", name: "Air Quality Monitor", location: "Plant A – Zone 2", type: "Air", value: "42 AQI", status: "Online", alert: false },
@@ -13,10 +15,10 @@ const sensors = [
 ];
 
 const iotDevices = [
-  { name: "Smart Helmet Fleet", count: 42, online: 38, icon: "⛑️" },
-  { name: "Safety Wearables", count: 120, online: 115, icon: "⌚" },
-  { name: "Emergency Beacons", count: 18, online: 18, icon: "🔦" },
-  { name: "CCTV Network", count: 64, online: 61, icon: "📷" },
+  { name: "Smart Helmet Fleet", count: 42, online: 38, emoji: "⛑️", emojiLabel: "Hard hat" },
+  { name: "Safety Wearables", count: 120, online: 115, emoji: "⌚", emojiLabel: "Wristwatch" },
+  { name: "Emergency Beacons", count: 18, online: 18, emoji: "🔦", emojiLabel: "Flashlight" },
+  { name: "CCTV Network", count: 64, online: 61, emoji: "📷", emojiLabel: "Camera" },
 ];
 
 const statusStyle: Record<string, string> = {
@@ -26,15 +28,22 @@ const statusStyle: Record<string, string> = {
   Offline: "bg-slate-100 text-slate-500",
 };
 
-const typeIcon: Record<string, React.ReactNode> = {
-  Air: <Wind className="h-3.5 w-3.5" />,
-  Temp: <Thermometer className="h-3.5 w-3.5" />,
-  Gas: <Zap className="h-3.5 w-3.5" />,
-  Noise: <Cpu className="h-3.5 w-3.5" />,
-  Humidity: <Droplets className="h-3.5 w-3.5" />,
-  Vibration: <Cpu className="h-3.5 w-3.5" />,
-  UV: <Zap className="h-3.5 w-3.5" />,
+const typeIcon: Record<string, ReactNode> = {
+  Air: <Wind className="h-3.5 w-3.5" aria-hidden="true" />,
+  Temp: <Thermometer className="h-3.5 w-3.5" aria-hidden="true" />,
+  Gas: <Zap className="h-3.5 w-3.5" aria-hidden="true" />,
+  Noise: <Cpu className="h-3.5 w-3.5" aria-hidden="true" />,
+  Humidity: <Droplets className="h-3.5 w-3.5" aria-hidden="true" />,
+  Vibration: <Cpu className="h-3.5 w-3.5" aria-hidden="true" />,
+  UV: <Zap className="h-3.5 w-3.5" aria-hidden="true" />,
 };
+
+function StatusIcon({ status }: { status: string }) {
+  if (status === "Offline") return <WifiOff className="h-3 w-3 text-slate-400" aria-hidden="true" />;
+  if (status === "Warning") return <Wifi className="h-3 w-3 text-yellow-400" aria-hidden="true" />;
+  if (status === "Alert") return <Wifi className="h-3 w-3 text-red-400" aria-hidden="true" />;
+  return <Wifi className="h-3 w-3 text-emerald-400" aria-hidden="true" />;
+}
 
 export default function EHSManagementPage() {
   const onlineCount = sensors.filter((s) => s.status === "Online").length;
@@ -53,7 +62,7 @@ export default function EHSManagementPage() {
           <Card key={s.label} className="border-0 shadow-sm">
             <CardContent className="p-4">
               <div className={`inline-flex items-center justify-center h-7 w-7 rounded-full ${s.bg} mb-3`}>
-                <Cpu className={`h-3.5 w-3.5 ${s.color}`} />
+                <Cpu className={`h-3.5 w-3.5 ${s.color}`} aria-hidden="true" />
               </div>
               <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
               <div className="text-xs text-slate-500 mt-0.5">{s.label}</div>
@@ -69,40 +78,44 @@ export default function EHSManagementPage() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                <Cpu className="h-4 w-4 text-violet-500" /> Sensor Grid
+                <Cpu className="h-4 w-4 text-violet-500" aria-hidden="true" /> Sensor Grid
               </CardTitle>
-              <button className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600">
-                <RefreshCw className="h-3 w-3" /> Refresh
-              </button>
+              <Button variant="ghost" size="sm" className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 h-7 px-2">
+                <RefreshCw className="h-3 w-3" aria-hidden="true" /> Refresh
+              </Button>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
+                <caption className="sr-only">IoT Sensor Grid</caption>
                 <thead>
                   <tr className="border-b border-slate-100">
                     {["ID", "Name", "Location", "Reading", "Status"].map((h) => (
-                      <th key={h} className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wide pb-2 pr-4">{h}</th>
+                      <th key={h} scope="col" className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wide pb-2 pr-4">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {sensors.map((s) => (
-                    <tr key={s.id} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${s.alert ? "bg-red-50/30" : ""}`}>
+                    <tr
+                      key={s.id}
+                      className={`border-b border-slate-50 transition-colors ${s.alert ? "bg-red-50/30 hover:bg-red-100/40" : "hover:bg-slate-50"}`}
+                    >
                       <td className="py-2.5 pr-4 text-xs font-mono text-slate-400">{s.id}</td>
                       <td className="py-2.5 pr-4">
                         <div className="flex items-center gap-1.5 text-xs text-slate-700">
                           <span className="text-slate-400">{typeIcon[s.type]}</span>
                           {s.name}
-                          {s.alert && <AlertTriangle className="h-3 w-3 text-red-400" />}
+                          {s.alert && <AlertTriangle className="h-3 w-3 text-red-400" aria-label="Alert" />}
                         </div>
                       </td>
                       <td className="py-2.5 pr-4 text-xs text-slate-500">{s.location}</td>
                       <td className="py-2.5 pr-4 text-xs font-mono text-slate-700">{s.value}</td>
                       <td className="py-2.5">
                         <div className="flex items-center gap-1">
-                          {s.status === "Offline" ? <WifiOff className="h-3 w-3 text-slate-400" /> : <Wifi className="h-3 w-3 text-emerald-400" />}
-                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${statusStyle[s.status]}`}>{s.status}</span>
+                          <StatusIcon status={s.status} />
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${statusStyle[s.status] ?? "bg-slate-100 text-slate-600"}`}>{s.status}</span>
                         </div>
                       </td>
                     </tr>
@@ -123,7 +136,7 @@ export default function EHSManagementPage() {
             <CardContent className="pt-0 space-y-3">
               {iotDevices.map((d) => (
                 <div key={d.name} className="flex items-center gap-3">
-                  <span className="text-xl">{d.icon}</span>
+                  <span role="img" aria-label={d.emojiLabel} className="text-xl">{d.emoji}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="font-medium text-slate-700 truncate">{d.name}</span>
@@ -144,7 +157,7 @@ export default function EHSManagementPage() {
           <Card className="border-0 shadow-sm bg-amber-50 border-amber-100">
             <CardContent className="p-4">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
                 <div>
                   <p className="text-xs font-semibold text-amber-700">Action Required</p>
                   <p className="text-[11px] text-amber-600 mt-0.5">

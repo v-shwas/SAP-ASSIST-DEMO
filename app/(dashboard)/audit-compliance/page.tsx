@@ -54,7 +54,10 @@ const complianceBar: Record<string, string> = {
 };
 
 export default function AuditCompliancePage() {
-  const overallScore = Math.round(complianceAreas.reduce((s, c) => s + c.score, 0) / complianceAreas.length);
+  const overallScore =
+    complianceAreas.length > 0
+      ? Math.round(complianceAreas.reduce((s, c) => s + c.score, 0) / complianceAreas.length)
+      : 0;
 
   return (
     <div className="p-6 space-y-6">
@@ -69,7 +72,7 @@ export default function AuditCompliancePage() {
           <Card key={m.label} className="border-0 shadow-sm">
             <CardContent className="p-4">
               <div className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${m.bg} mb-3`}>
-                <m.icon className={`h-3.5 w-3.5 ${m.color}`} />
+                <m.icon className={`h-3.5 w-3.5 ${m.color}`} aria-hidden="true" />
               </div>
               <div className="text-2xl font-bold text-slate-800">{m.value}</div>
               <div className="text-xs text-slate-500 mt-0.5">{m.label}</div>
@@ -83,7 +86,7 @@ export default function AuditCompliancePage() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-cyan-500" /> Compliance Scorecard
+              <TrendingUp className="h-4 w-4 text-cyan-500" aria-hidden="true" /> Compliance Scorecard
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-4">
@@ -91,13 +94,16 @@ export default function AuditCompliancePage() {
               <div key={area.label}>
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs font-medium text-slate-700">{area.label}</span>
-                  <span className={`text-xs ${complianceStatus[area.status]}`}>{area.score}%</span>
+                  <span className={`text-xs ${complianceStatus[area.status] ?? "text-slate-600"}`}>{area.score}%</span>
                 </div>
                 <div className="h-1.5 bg-slate-100 rounded-full mb-0.5">
-                  <div className={`h-1.5 rounded-full ${complianceBar[area.status]}`} style={{ width: `${area.score}%` }} />
+                  <div
+                    className={`h-1.5 rounded-full ${complianceBar[area.status] ?? "bg-slate-400"}`}
+                    style={{ width: `${area.score}%` }}
+                  />
                 </div>
                 <div className="flex justify-between">
-                  <span className={`text-[10px] ${complianceStatus[area.status]}`}>{area.status}</span>
+                  <span className={`text-[10px] ${complianceStatus[area.status] ?? "text-slate-600"}`}>{area.status}</span>
                   <span className="text-[10px] text-slate-400">Last: {area.lastAudit}</span>
                 </div>
               </div>
@@ -109,7 +115,7 @@ export default function AuditCompliancePage() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-blue-500" /> Audit Schedule
+              <Calendar className="h-4 w-4 text-blue-500" aria-hidden="true" /> Audit Schedule
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
@@ -117,10 +123,10 @@ export default function AuditCompliancePage() {
               <div key={audit.name} className="p-2.5 border border-slate-100 rounded-lg hover:border-slate-200 transition-colors">
                 <div className="flex items-center justify-between gap-1 mb-1">
                   <p className="text-xs font-medium text-slate-700 truncate">{audit.name}</p>
-                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded flex-shrink-0 ${statusStyle[audit.status]}`}>{audit.status}</span>
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded flex-shrink-0 ${statusStyle[audit.status] ?? "bg-slate-100 text-slate-600"}`}>{audit.status}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                  <Clock className="h-2.5 w-2.5" /> {audit.date}
+                  <Clock className="h-2.5 w-2.5" aria-hidden="true" /> {audit.date}
                   <span className="text-slate-300">·</span>
                   {audit.auditor}
                 </div>
@@ -134,7 +140,7 @@ export default function AuditCompliancePage() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <FileText className="h-4 w-4 text-red-400" /> Non-Conformances
+              <FileText className="h-4 w-4 text-red-400" aria-hidden="true" /> Non-Conformances
             </CardTitle>
             <CardDescription className="text-xs">Audit findings and CAPA tracking</CardDescription>
           </CardHeader>
@@ -143,13 +149,11 @@ export default function AuditCompliancePage() {
               <div key={f.id} className={`p-2.5 border rounded-lg ${f.status === "Open" ? "border-red-100 bg-red-50/30" : "border-slate-100"}`}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[10px] font-mono text-slate-400">{f.id}</span>
-                  <div className="flex items-center gap-1">
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${findingStatusStyle[f.status]}`}>{f.status}</span>
-                  </div>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${findingStatusStyle[f.status] ?? "bg-slate-100 text-slate-600"}`}>{f.status}</span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">{f.description}</p>
                 <div className="flex items-center justify-between mt-1.5">
-                  <span className={`text-[10px] ${severityStyle[f.severity]}`}>{f.severity}</span>
+                  <span className={`text-[10px] ${severityStyle[f.severity] ?? "text-slate-600"}`}>{f.severity}</span>
                   <span className="text-[10px] text-slate-400">Due: {f.due}</span>
                 </div>
               </div>

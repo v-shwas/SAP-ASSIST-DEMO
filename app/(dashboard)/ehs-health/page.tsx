@@ -1,12 +1,18 @@
-import { Activity, AlertTriangle, CheckCircle, TrendingDown, TrendingUp, Users, Clock, MapPin } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle, TrendingDown, TrendingUp, Minus, Users, Clock, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 const metrics = [
   { label: "Total Incidents (MTD)", value: "3", delta: "-2 vs last month", trend: "down", icon: AlertTriangle, color: "text-red-500", bg: "bg-red-50" },
   { label: "Near Misses", value: "11", delta: "+1 vs last month", trend: "up", icon: Activity, color: "text-yellow-500", bg: "bg-yellow-50" },
   { label: "Days Without Incident", value: "28", delta: "Site A record", trend: "up", icon: CheckCircle, color: "text-emerald-500", bg: "bg-emerald-50" },
   { label: "Workers at Risk", value: "4", delta: "Immediate action", trend: "neutral", icon: Users, color: "text-orange-500", bg: "bg-orange-50" },
+];
+
+const riskScores = [
+  { label: "Air Quality", score: 88, color: "bg-emerald-400" },
+  { label: "Fire Safety", score: 72, color: "bg-yellow-400" },
+  { label: "Chemical Handling", score: 51, color: "bg-orange-400" },
+  { label: "Ergonomics", score: 90, color: "bg-emerald-400" },
 ];
 
 const sites = [
@@ -36,6 +42,12 @@ const severityColor: Record<string, string> = {
   Info: "bg-blue-100 text-blue-700",
 };
 
+const statusDotColor: Record<string, string> = {
+  Healthy: "bg-emerald-400",
+  Warning: "bg-yellow-400",
+  Critical: "bg-red-400",
+};
+
 export default function EHSHealthPage() {
   return (
     <div className="p-6 space-y-6">
@@ -52,8 +64,15 @@ export default function EHSHealthPage() {
               </div>
               <div className="text-2xl font-bold text-slate-800">{m.value}</div>
               <div className="flex items-center gap-1 mt-1">
-                {m.trend === "down" && <TrendingDown className="h-3 w-3 text-emerald-500" />}
-                {m.trend === "up" && <TrendingUp className="h-3 w-3 text-red-400" />}
+                {m.trend === "down" && (
+                  <TrendingDown className="h-3 w-3 text-emerald-500" aria-label="Improving trend" />
+                )}
+                {m.trend === "up" && (
+                  <TrendingUp className="h-3 w-3 text-red-400" aria-label="Worsening trend" />
+                )}
+                {m.trend === "neutral" && (
+                  <Minus className="h-3 w-3 text-slate-400" aria-label="No change" />
+                )}
                 <span className="text-[11px] text-slate-400">{m.delta}</span>
               </div>
             </CardContent>
@@ -74,7 +93,10 @@ export default function EHSHealthPage() {
               {sites.map((site) => (
                 <div key={site.name} className="flex items-center justify-between py-2.5 border-b border-slate-100 last:border-0">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`h-2 w-2 rounded-full flex-shrink-0 ${site.status === "Healthy" ? "bg-emerald-400" : site.status === "Warning" ? "bg-yellow-400" : "bg-red-400"}`} />
+                    <div
+                      className={`h-2 w-2 rounded-full flex-shrink-0 ${statusDotColor[site.status] ?? "bg-slate-400"}`}
+                      aria-hidden="true"
+                    />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-slate-700 truncate">{site.name}</p>
                       <p className="text-[11px] text-slate-400 flex items-center gap-1">
@@ -84,7 +106,7 @@ export default function EHSHealthPage() {
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-[11px] text-slate-500">{site.incidents} incident{site.incidents !== 1 ? "s" : ""}</span>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${statusColor[site.status]}`}>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${statusColor[site.status] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}>
                       {site.status}
                     </span>
                   </div>
@@ -108,12 +130,7 @@ export default function EHSHealthPage() {
               </div>
             </div>
             <div className="w-full space-y-2">
-              {[
-                { label: "Air Quality", score: 88, color: "bg-emerald-400" },
-                { label: "Fire Safety", score: 72, color: "bg-yellow-400" },
-                { label: "Chemical Handling", score: 51, color: "bg-orange-400" },
-                { label: "Ergonomics", score: 90, color: "bg-emerald-400" },
-              ].map((r) => (
+              {riskScores.map((r) => (
                 <div key={r.label}>
                   <div className="flex justify-between text-[11px] text-slate-500 mb-0.5">
                     <span>{r.label}</span><span>{r.score}</span>
@@ -136,10 +153,11 @@ export default function EHSHealthPage() {
         <CardContent className="pt-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
+              <caption className="sr-only">Recent EHS Events</caption>
               <thead>
                 <tr className="border-b border-slate-100">
                   {["ID", "Type", "Description", "Site", "Severity", "Time"].map((h) => (
-                    <th key={h} className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wide pb-2 pr-4">{h}</th>
+                    <th key={h} scope="col" className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wide pb-2 pr-4">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -151,7 +169,7 @@ export default function EHSHealthPage() {
                     <td className="py-2.5 pr-4 text-xs text-slate-600">{ev.description}</td>
                     <td className="py-2.5 pr-4 text-xs text-slate-500">{ev.site}</td>
                     <td className="py-2.5 pr-4">
-                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${severityColor[ev.severity]}`}>{ev.severity}</span>
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${severityColor[ev.severity] ?? "bg-slate-100 text-slate-600"}`}>{ev.severity}</span>
                     </td>
                     <td className="py-2.5 text-xs text-slate-400">{ev.time}</td>
                   </tr>
