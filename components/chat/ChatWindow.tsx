@@ -50,7 +50,7 @@ export function ChatWindow({ onSendMessage, messages, isLoading }: ChatWindowPro
             <div>
               <h2 className="text-xl font-semibold text-slate-800">Tirupathi Oils — SAP Assistant</h2>
               <p className="text-sm text-slate-500 mt-1">
-                Ask Joule about your sales, inventory, profitability, cash flow, or any SAP data.
+                Ask about your sales, inventory, profitability, cash flow, or any SAP data.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl w-full">

@@ -392,7 +392,7 @@ async function queryDemandForecast(input: any) {
       confidence: f.confidence,
     })),
     recommendation: "Increase Groundnut Oil production capacity by 15% — strong upward demand trend. Consider reducing Corn Oil batches.",
-    data_source: "S/4HANA Sales Data → SAP Datasphere → AI Core Forecast → SAP Analytics Cloud → Joule Response",
+    data_source: "S/4HANA Sales Data → SAP Datasphere → AI Core Forecast → SAP Analytics Cloud",
   };
 }
 

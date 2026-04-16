@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   {
     href: "/chat",
-    label: "AI Chatbot (Joule)",
+    label: "AI Chatbot",
     icon: MessageSquare,
     color: "text-blue-400",
     hoverColor: "group-hover:text-blue-400",
