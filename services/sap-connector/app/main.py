@@ -1,5 +1,6 @@
 """SAP Connector microservice — translates Claude tool calls to SAP OData/RFC calls."""
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,9 +28,14 @@ app = FastAPI(
 )
 
 # CORS — only allow the Next.js app origin in prod; wide-open in dev
+_ALLOWED_ORIGINS = list(filter(None, [
+    "http://localhost:3000",
+    os.environ.get("NEXT_PUBLIC_APP_URL"),   # e.g. https://your-app.vercel.app
+]))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["POST", "GET"],
     allow_headers=["*"],

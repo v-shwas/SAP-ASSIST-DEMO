@@ -6,6 +6,17 @@
 
   "regions": ["iad1"],
 
+  "experimentalServices": {
+    "frontend": {
+      "routePrefix": "/",
+      "framework": "nextjs"
+    },
+    "sap-connector": {
+      "entrypoint": "services/sap-connector",
+      "routePrefix": "/_/sap-connector"
+    }
+  },
+
   "functions": {
     "app/api/chat/route.ts": {
       "maxDuration": 30
@@ -21,6 +32,10 @@
     },
     "app/api/settings/test-sap-connection/route.ts": {
       "maxDuration": 15
+    },
+    "services/sap-connector/api/index.py": {
+      "maxDuration": 30,
+      "runtime": "python3.12"
     }
   },
 
@@ -37,6 +52,12 @@
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" }
+      ]
+    },
+    {
+      "source": "/_/sap-connector/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     }
   ]
