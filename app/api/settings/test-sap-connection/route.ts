@@ -1,3 +1,5 @@
+export const maxDuration = 15;
+
 export async function POST(request: Request) {
   const { sapUrl, sapUsername, sapPassword, sapClient, connType } = await request.json();
 

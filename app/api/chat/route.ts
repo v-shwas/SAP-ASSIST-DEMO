@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI, SchemaType, type FunctionDeclaration, type Content, type Part } from "@google/generative-ai";
 import { executeSapTool } from "@/lib/sap-client";
 
+export const maxDuration = 30;
+
 const SYSTEM_PROMPT = `You are Joule, the AI assistant for Tirupathi Oils — an edible oil manufacturing company.
 
 Company: Tirupathi Oils

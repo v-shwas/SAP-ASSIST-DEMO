@@ -17,28 +17,6 @@
     }
   },
 
-  "functions": {
-    "app/api/chat/route.ts": {
-      "maxDuration": 30
-    },
-    "app/api/conversations/route.ts": {
-      "maxDuration": 10
-    },
-    "app/api/conversations/[id]/messages/route.ts": {
-      "maxDuration": 10
-    },
-    "app/api/settings/sap-config/route.ts": {
-      "maxDuration": 10
-    },
-    "app/api/settings/test-sap-connection/route.ts": {
-      "maxDuration": 15
-    },
-    "services/sap-connector/api/index.py": {
-      "maxDuration": 30,
-      "runtime": "python3.12"
-    }
-  },
-
   "headers": [
     {
       "source": "/api/chat",
