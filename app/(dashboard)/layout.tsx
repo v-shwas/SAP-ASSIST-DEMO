@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Trash2,
   Store,
+  MessageSquare,
   Menu,
   X,
   Layers,
@@ -21,6 +22,14 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
+  {
+    href: "/chat",
+    label: "AI Chatbot (Joule)",
+    icon: MessageSquare,
+    color: "text-blue-400",
+    hoverColor: "group-hover:text-blue-400",
+    description: "SAP data assistant",
+  },
   {
     href: "/ehs-health",
     label: "EHS Health Status",
@@ -114,18 +123,19 @@ function Sidebar({ className, onClose }: { className?: string; onClose?: () => v
         )}
       </div>
 
-      {/* Section label */}
-      <div className="px-5 pt-4 pb-1">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Services</span>
-      </div>
-
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">
-        {navItems.map((item) => {
+      <nav className="flex-1 overflow-y-auto px-3 pb-3 pt-3 space-y-0.5">
+        {navItems.map((item, index) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
+            <div key={item.href}>
+              {/* Divider before EHS services */}
+              {index === 1 && (
+                <div className="px-2 pt-3 pb-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">EHS Services</span>
+                </div>
+              )}
             <Link
-              key={item.href}
               href={item.href}
               onClick={onClose}
               className={cn(
@@ -146,6 +156,7 @@ function Sidebar({ className, onClose }: { className?: string; onClose?: () => v
                 <span className="text-[10px] text-slate-500 truncate">{item.description}</span>
               </div>
             </Link>
+            </div>
           );
         })}
       </nav>
