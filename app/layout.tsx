@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SAP AI Chatbot",
-  description: "Ask your SAP data anything — powered by Claude AI",
+  title: "SAP AI Assistant",
+  description: "Ask your SAP data anything — conversational analytics for sales, inventory, profitability and more.",
 };
 
 export default function RootLayout({

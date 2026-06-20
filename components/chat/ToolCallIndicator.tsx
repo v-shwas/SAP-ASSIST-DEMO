@@ -12,6 +12,8 @@ const toolLabels: Record<string, string> = {
   get_demand_forecast: "Demand forecast",
   run_analytics_query: "Analytics query",
   get_gst_reconciliation: "GST reconciliation",
+  get_cash_flow_forecast: "Cash flow forecast",
+  get_risk_insights: "Risk insights",
 };
 
 interface ToolCallIndicatorProps {
