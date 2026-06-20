@@ -8,6 +8,13 @@ import { getPrisma } from "@/lib/prisma";
 
 const COMPANY_NAME = "Tirupathi Oils";
 
+// Hard caps so a "2 years of data" question can't pull tens of thousands of rows
+// into the serverless function and the LLM prompt. Totals are computed with DB
+// aggregates; only bounded detail lists are returned.
+const MAX_DETAIL_ROWS = 50; // detail rows returned in a tool payload
+const MAX_TREND_POINTS = 24; // time-series points (e.g. 24 months / quarters)
+const MAX_SCAN_ROWS = 500; // cap for scans that must compute in JS (no SQL equivalent)
+
 async function getCompanyId(): Promise<string> {
   const prisma = getPrisma();
   const company = await prisma.company.findFirst({ where: { name: COMPANY_NAME } });
@@ -47,7 +54,7 @@ async function queryProfitability(input: any) {
   const prisma = getPrisma();
   const cid = await getCompanyId();
   const dimension = input.dimension ?? "product";
-  const topN = input.top_n ?? 7;
+  const topN = Math.min(input.top_n ?? 7, MAX_DETAIL_ROWS);
   const period = input.period ?? "2026-Q1";
 
   if (dimension === "region") {
@@ -119,10 +126,11 @@ async function queryRevenue(input: any) {
   const monthly = await prisma.revenueRecord.findMany({
     where: { companyId: cid, period: { contains: "-2026" } },
     orderBy: { period: "asc" },
+    take: MAX_TREND_POINTS,
   });
   const quarterly = monthly.filter(r => r.period.startsWith("20"));
   const monthlyOnly = monthly.filter(r => !r.period.startsWith("20"));
-  const salesOrgs = await prisma.salesOrg.findMany({ where: { companyId: cid } });
+  const salesOrgs = await prisma.salesOrg.findMany({ where: { companyId: cid }, take: MAX_DETAIL_ROWS });
 
   const ytdRevenue = monthlyOnly.reduce((s, r) => s + r.revenue, 0);
   const ytdTarget = monthlyOnly.reduce((s, r) => s + r.target, 0);
@@ -156,7 +164,7 @@ async function queryCostAnalysis(input: any) {
   const cid = await getCompanyId();
   const period = input.period ?? "2026-Q1";
 
-  const elements = await prisma.costElement.findMany({ where: { companyId: cid, period } });
+  const elements = await prisma.costElement.findMany({ where: { companyId: cid, period }, take: MAX_DETAIL_ROWS });
   const totalActual = elements.reduce((s, e) => s + e.actual, 0);
   const totalPlanned = elements.reduce((s, e) => s + e.planned, 0);
 
@@ -184,18 +192,27 @@ async function queryOrders(input: any) {
     where,
     include: { Customer: true, Product: true },
     orderBy: { orderDate: "desc" },
-    take: input.limit ?? 10,
+    take: Math.min(input.limit ?? 10, MAX_DETAIL_ROWS),
   });
 
-  const allOrders = await prisma.salesOrder.findMany({ where: { companyId: cid } });
-  const openValue = allOrders.filter(o => o.status === "open").reduce((s, o) => s + o.value, 0);
-  const delayed = allOrders.filter(o => o.delayReason);
+  // Aggregate in the DB instead of scanning every order into memory.
+  const openAgg = await prisma.salesOrder.aggregate({
+    _sum: { value: true },
+    where: { companyId: cid, status: "open" },
+  });
+  const delayedCount = await prisma.salesOrder.count({
+    where: { companyId: cid, delayReason: { not: null } },
+  });
+  const delayed = await prisma.salesOrder.findMany({
+    where: { companyId: cid, delayReason: { not: null } },
+    take: MAX_DETAIL_ROWS,
+  });
 
   return {
     company: COMPANY_NAME,
     total_orders: orders.length,
-    open_value: openValue,
-    delayed_orders: delayed.length,
+    open_value: openAgg._sum.value ?? 0,
+    delayed_orders: delayedCount,
     delay_info: delayed.map(d => `${d.orderId} — ${d.delayReason}`).join("; "),
     orders: orders.map(o => ({
       order_id: o.orderId,
@@ -218,7 +235,10 @@ async function queryShipments(input: any) {
   const shipments = await prisma.shipment.findMany({
     where: { companyId: cid },
     include: { Product: true },
+    orderBy: { eta: "desc" },
+    take: MAX_DETAIL_ROWS,
   });
+  // On-time rate is computed over the recent window loaded above.
   const delivered = shipments.filter(s => s.status === "Delivered");
   const onTimePct = delivered.length > 0
     ? Math.round((delivered.filter(s => s.actual && s.actual <= s.eta).length / delivered.length) * 1000) / 10
@@ -259,13 +279,19 @@ async function queryReturns() {
   const returns = await prisma.returnOrder.findMany({
     where: { companyId: cid },
     include: { Product: true, Customer: true },
+    orderBy: { value: "desc" },
+    take: MAX_DETAIL_ROWS,
   });
-  const totalValue = returns.reduce((s, r) => s + r.value, 0);
+  const totals = await prisma.returnOrder.aggregate({
+    _sum: { value: true },
+    _count: true,
+    where: { companyId: cid },
+  });
 
   return {
     company: COMPANY_NAME,
-    total_returns: returns.length,
-    return_value: totalValue,
+    total_returns: totals._count,
+    return_value: totals._sum.value ?? 0,
     return_rate_pct: 1.8,
     returns: returns.map(r => ({
       rma_id: r.rmaId,
@@ -286,13 +312,18 @@ async function queryInventory(input: any) {
   const cid = await getCompanyId();
   const alertOnly = input.alert_only ?? false;
 
+  // aiSignal compares stock vs safetyStock per row (no SQL equivalent), so we scan
+  // a bounded set — highest-value items first — rather than the whole catalogue.
   const items = await prisma.inventoryItem.findMany({
     where: { companyId: cid },
     include: { Product: true, Plant: true },
+    orderBy: { value: "desc" },
+    take: MAX_SCAN_ROWS,
   });
   const plantSummaries = await prisma.plantSummary.findMany({
     where: { companyId: cid },
     include: { Plant: true },
+    take: MAX_DETAIL_ROWS,
   });
 
   const itemsWithSignal = items.map(i => ({
@@ -316,7 +347,7 @@ async function queryInventory(input: any) {
     dead_stock_items: itemsWithSignal.filter(i => i.signal === "Dead Stock").length,
     capital_blocked: totalCapitalBlocked,
     forecast_accuracy: "94%",
-    items: filtered.map(i => ({
+    items: filtered.slice(0, MAX_DETAIL_ROWS).map(i => ({
       material: i.Product.sku,
       description: i.Product.name,
       plant: `${i.Plant.code} — ${i.Plant.name}`,
@@ -341,8 +372,12 @@ async function querySuppliers() {
   const prisma = getPrisma();
   const cid = await getCompanyId();
 
-  const suppliers = await prisma.supplier.findMany({ where: { companyId: cid } });
-  const avgOnTime = suppliers.reduce((s, v) => s + v.onTimePct, 0) / suppliers.length;
+  const suppliers = await prisma.supplier.findMany({ where: { companyId: cid }, take: MAX_DETAIL_ROWS });
+  const onTimeAgg = await prisma.supplier.aggregate({
+    _avg: { onTimePct: true },
+    where: { companyId: cid },
+  });
+  const avgOnTime = onTimeAgg._avg.onTimePct ?? 0;
 
   return {
     company: COMPANY_NAME,
@@ -368,10 +403,12 @@ async function queryDemandForecast(input: any) {
     where: { companyId: cid },
     include: { Product: true },
     orderBy: { forecastRevenue: "desc" },
+    take: MAX_DETAIL_ROWS,
   });
   const quarterly = await prisma.revenueRecord.findMany({
     where: { companyId: cid, period: { startsWith: "20" } },
     orderBy: { period: "asc" },
+    take: MAX_TREND_POINTS,
   });
 
   return {
@@ -403,6 +440,7 @@ async function queryAnalytics(input: any) {
   const records = await prisma.profitabilityByRegion.findMany({
     where: { companyId: cid },
     orderBy: { revenue: "desc" },
+    take: MAX_DETAIL_ROWS,
   });
 
   return {
@@ -429,14 +467,20 @@ async function queryGst(input: any) {
   const where: any = { companyId: cid, period };
   if (mismatchOnly) where.status = "Mismatch";
 
-  const records = await prisma.gstRecord.findMany({ where, include: { Supplier: true } });
-  const allRecords = await prisma.gstRecord.findMany({ where: { companyId: cid, period } });
+  const records = await prisma.gstRecord.findMany({ where, include: { Supplier: true }, take: MAX_DETAIL_ROWS });
 
-  const totalOutput = allRecords.reduce((s, r) => s + r.invoiceValue, 0);
-  const totalItcClaimed = allRecords.reduce((s, r) => s + r.claimedItc, 0);
-  const totalItcEligible = allRecords.reduce((s, r) => s + r.eligibleItc, 0);
-  const mismatchValue = allRecords.reduce((s, r) => s + r.mismatch, 0);
-  const mismatchCount = allRecords.filter(r => r.status === "Mismatch").length;
+  // Totals come from DB aggregates, not a full-period row scan.
+  const totals = await prisma.gstRecord.aggregate({
+    _sum: { invoiceValue: true, claimedItc: true, eligibleItc: true, mismatch: true },
+    where: { companyId: cid, period },
+  });
+  const totalOutput = totals._sum.invoiceValue ?? 0;
+  const totalItcClaimed = totals._sum.claimedItc ?? 0;
+  const totalItcEligible = totals._sum.eligibleItc ?? 0;
+  const mismatchValue = totals._sum.mismatch ?? 0;
+  const mismatchCount = await prisma.gstRecord.count({
+    where: { companyId: cid, period, status: "Mismatch" },
+  });
 
   return {
     company: COMPANY_NAME,
@@ -468,9 +512,14 @@ async function queryCashFlow(input: any) {
     where: { companyId: cid, outstanding: { gt: 0 } },
     include: { Customer: true },
     orderBy: { agingDays: "desc" },
+    take: MAX_DETAIL_ROWS,
+  });
+  const outstandingAgg = await prisma.receivable.aggregate({
+    _sum: { outstanding: true },
+    where: { companyId: cid, outstanding: { gt: 0 } },
   });
 
-  const totalOutstanding = receivables.reduce((s, r) => s + r.outstanding, 0);
+  const totalOutstanding = outstandingAgg._sum.outstanding ?? 0;
   const top = receivables[0];
 
   return {
@@ -502,12 +551,18 @@ async function queryRiskInsights() {
   const regions = await prisma.regionRisk.findMany({
     where: { companyId: cid },
     orderBy: { overdueAmount: "desc" },
+    take: MAX_DETAIL_ROWS,
   });
   const businessRisks = await prisma.businessRisk.findMany({
     where: { companyId: cid },
     orderBy: { severity: "asc" },
+    take: MAX_DETAIL_ROWS,
   });
-  const totalOverdue = regions.reduce((s, r) => s + r.overdueAmount, 0);
+  const overdueAgg = await prisma.regionRisk.aggregate({
+    _sum: { overdueAmount: true },
+    where: { companyId: cid },
+  });
+  const totalOverdue = overdueAgg._sum.overdueAmount ?? 0;
 
   return {
     company: COMPANY_NAME,
